@@ -123,8 +123,10 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 .core{background:var(--surface-inner);border:1px solid var(--hairline);border-radius:18px;overflow:hidden}
 
 .repo-row{padding:14px 20px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;justify-content:space-between;gap:10px}
-.repo-row-label{font-size:11px;font-weight:500;color:var(--ink-secondary);letter-spacing:0.04em;text-transform:uppercase}
+.repo-row-label{font-size:11px;font-weight:500;color:var(--ink-secondary);letter-spacing:0.04em;text-transform:uppercase;flex-shrink:0}
 .repo-row-value{font-family:var(--font-mono);font-size:12px;color:var(--ink-primary);direction:ltr}
+.repo-input{flex:1;max-width:260px;padding:8px 12px;background:var(--surface-input);border:1px solid var(--hairline);border-radius:8px;font-family:var(--font-mono);font-size:12px;color:var(--ink-primary);text-align:left;transition:border-color 200ms var(--ease)}
+.repo-input:focus{outline:none;border-color:rgba(196,165,114,0.3);box-shadow:0 0 0 3px var(--accent-soft)}
 
 .file-row{padding:16px 20px;border-bottom:1px solid var(--hairline);position:relative}
 .file-row-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
@@ -313,10 +315,16 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
   <section class="shell">
     <div class="core">
 
-      <!-- REPO ROW -->
+      <!-- REPO ROW (editable) -->
       <div class="repo-row">
-        <span class="repo-row-label">المستودع</span>
-        <span class="repo-row-value">pocketstudio-dev/pocket-studio</span>
+        <label class="repo-row-label" for="repoInput">المستودع</label>
+        <input type="text" class="repo-input" id="repoInput"
+               value="pocketstudio-dev/pocket-studio"
+               placeholder="owner/repo"
+               dir="ltr"
+               spellcheck="false"
+               autocapitalize="off"
+               autocorrect="off">
       </div>
 
       <!-- FILE ROWS (dynamic) -->
@@ -380,13 +388,18 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 'use strict';
 
 /* ============ CONSTANTS ============ */
-const REPO = 'pocketstudio-dev/pocket-studio';
+const DEFAULT_REPO = 'pocketstudio-dev/pocket-studio';
+function REPO() {
+  const input = document.getElementById('repoInput');
+  const v = input && input.value ? input.value.trim() : '';
+  return v || DEFAULT_REPO;
+}
 const MAX_LOGS = 50;
 const MAX_RECENT = 5;
-const SOFT_SIZE_LIMIT = 1024 * 1024;
-const HARD_SIZE_LIMIT = 100 * 1024 * 1024;
-const DRAFT_TTL = 24 * 60 * 60 * 1000;
-const DRAFT_SAVE_INTERVAL = 5000;
+const SOFT_SIZE_LIMIT = 1024 * 1024;       // 1 MB warn
+const HARD_SIZE_LIMIT = 100 * 1024 * 1024; // 100 MB block
+const DRAFT_TTL = 24 * 60 * 60 * 1000;     // 24 hours
+const DRAFT_SAVE_INTERVAL = 5000;          // 5 seconds
 
 const LANG_MAP = {
   py:'python', pyw:'python',
@@ -428,7 +441,7 @@ let PAT = sessionStorage.getItem('gm_pat') || '';
 let username = sessionStorage.getItem('gm_user') || '';
 let logs = readLS('gm_logs', []);
 let recent = readLS('gm_recent', []);
-let files = [];
+let files = []; // [{ path, content, sha?, isExisting }]
 let mode = 'new';
 let currentBrowsePath = '';
 let draftTimer = null;
@@ -535,14 +548,14 @@ async function validatePAT(token) {
 }
 
 async function listContents(path) {
-  const url = '/repos/' + REPO + '/contents/' + encodeURIComponent(path).replace(/%2F/g, '/');
+  const url = '/repos/' + REPO() + '/contents/' + encodeURIComponent(path).replace(/%2F/g, '/');
   const r = await ghFetch(url);
   if (!r.ok) throw new Error(patErrorMsg(r.status, r.data));
   return Array.isArray(r.data) ? r.data : [r.data];
 }
 
 async function getFileContent(path) {
-  const url = '/repos/' + REPO + '/contents/' + encodeURIComponent(path).replace(/%2F/g, '/');
+  const url = '/repos/' + REPO() + '/contents/' + encodeURIComponent(path).replace(/%2F/g, '/');
   const r = await ghFetch(url);
   if (!r.ok) throw new Error(patErrorMsg(r.status, r.data));
   if (Array.isArray(r.data)) throw new Error('المسار مجلد وليس ملف');
@@ -550,10 +563,12 @@ async function getFileContent(path) {
   return { content, sha: r.data.sha };
 }
 
+/* Single file publish (uses Contents API) */
 async function publishSingleFile(file, message) {
-  const url = '/repos/' + REPO + '/contents/' + encodeURIComponent(file.path).replace(/%2F/g, '/');
+  const url = '/repos/' + REPO() + '/contents/' + encodeURIComponent(file.path).replace(/%2F/g, '/');
   let sha = file.sha;
   if (!sha) {
+    // Try to fetch existing SHA
     try {
       const r = await ghFetch(url);
       if (r.ok && !Array.isArray(r.data)) sha = r.data.sha;
@@ -570,18 +585,22 @@ async function publishSingleFile(file, message) {
   return r.data;
 }
 
+/* Multi-file publish (uses Git Data API) */
 async function publishMultiFile(filesArr, message) {
-  const refR = await ghFetch('/repos/' + REPO + '/git/ref/heads/main');
+  // 1. Get current main ref
+  const refR = await ghFetch('/repos/' + REPO() + '/git/ref/heads/main');
   if (!refR.ok) throw new Error(patErrorMsg(refR.status, refR.data));
   const parentSha = refR.data.object.sha;
 
-  const commitR = await ghFetch('/repos/' + REPO + '/git/commits/' + parentSha);
+  // 2. Get current commit's tree sha
+  const commitR = await ghFetch('/repos/' + REPO() + '/git/commits/' + parentSha);
   if (!commitR.ok) throw new Error(patErrorMsg(commitR.status, commitR.data));
   const baseTreeSha = commitR.data.tree.sha;
 
+  // 3. Create blobs for each file (sequential to keep order + clearer errors)
   const treeEntries = [];
   for (const f of filesArr) {
-    const blobR = await ghFetch('/repos/' + REPO + '/git/blobs', {
+    const blobR = await ghFetch('/repos/' + REPO() + '/git/blobs', {
       method: 'POST',
       body: JSON.stringify({
         content: b64encode(f.content),
@@ -597,13 +616,15 @@ async function publishMultiFile(filesArr, message) {
     });
   }
 
-  const treeR = await ghFetch('/repos/' + REPO + '/git/trees', {
+  // 4. Create new tree
+  const treeR = await ghFetch('/repos/' + REPO() + '/git/trees', {
     method: 'POST',
     body: JSON.stringify({ base_tree: baseTreeSha, tree: treeEntries })
   });
   if (!treeR.ok) throw new Error(patErrorMsg(treeR.status, treeR.data));
 
-  const newCommitR = await ghFetch('/repos/' + REPO + '/git/commits', {
+  // 5. Create commit
+  const newCommitR = await ghFetch('/repos/' + REPO() + '/git/commits', {
     method: 'POST',
     body: JSON.stringify({
       message,
@@ -613,7 +634,8 @@ async function publishMultiFile(filesArr, message) {
   });
   if (!newCommitR.ok) throw new Error(patErrorMsg(newCommitR.status, newCommitR.data));
 
-  const updR = await ghFetch('/repos/' + REPO + '/git/refs/heads/main', {
+  // 6. Update ref
+  const updR = await ghFetch('/repos/' + REPO() + '/git/refs/heads/main', {
     method: 'PATCH',
     body: JSON.stringify({ sha: newCommitR.data.sha })
   });
@@ -665,8 +687,11 @@ function logout() {
   location.reload();
 }
 
+/* ============ AFTER UNLOCK ============ */
 function afterUnlock() {
+  // Restore draft if recent
   maybeRestoreDraft();
+  // Start auto-save
   startDraftTimer();
 }
 
@@ -681,6 +706,7 @@ function renderFileRows() {
 function buildFileRow(file, idx) {
   const row = el('div', { class: 'file-row' });
 
+  // Header
   const header = el('div', { class: 'file-row-header' });
   header.appendChild(el('span', { class: 'file-row-num' }, '#' + (idx + 1) + (file.isExisting ? ' • تعديل' : ' • جديد')));
 
@@ -699,6 +725,7 @@ function buildFileRow(file, idx) {
   header.appendChild(actionsBox);
   row.appendChild(header);
 
+  // Path input
   row.appendChild(el('label', { class: 'label-text' }, 'اسم الملف / المسار'));
   const pathInput = el('input', {
     type: 'text',
@@ -717,6 +744,7 @@ function buildFileRow(file, idx) {
   });
   row.appendChild(pathInput);
 
+  // Content textarea
   row.appendChild(el('label', { class: 'label-text', style: 'margin-top:14px' }, 'المحتوى'));
   const codeArea = el('textarea', {
     class: 'code-area',
@@ -735,6 +763,7 @@ function buildFileRow(file, idx) {
   });
   row.appendChild(codeArea);
 
+  // Preview pane (for existing files)
   if (file.isExisting && file.content) {
     const previewWrap = el('div', { class: 'preview-wrap show', id: 'preview-' + idx });
     const previewHeader = el('div', { class: 'preview-header' });
@@ -756,6 +785,7 @@ function buildFileRow(file, idx) {
     previewWrap.appendChild(pre);
     row.appendChild(previewWrap);
 
+    // Highlight after appending
     setTimeout(() => {
       try { window.hljs && hljs.highlightElement(code); } catch {}
     }, 0);
@@ -817,6 +847,7 @@ function smartCommitMessage() {
     const f = files[0];
     return (f.isExisting || f.sha) ? ('Update ' + f.path) : ('Add ' + f.path);
   }
+  // Multi-file: list them if <=3, else count
   if (files.length <= 3) {
     return 'Update ' + files.map(f => f.path).join(', ');
   }
@@ -825,6 +856,7 @@ function smartCommitMessage() {
 
 /* ============ PUBLISH ============ */
 async function publish() {
+  // Validate
   if (files.length === 0) return showStatus('error', 'لا توجد ملفات للنشر');
   for (let i = 0; i < files.length; i++) {
     if (!files[i].path || !files[i].path.trim()) {
@@ -835,6 +867,7 @@ async function publish() {
     }
   }
 
+  // Size check
   const totalBytes = files.reduce((s, f) => s + new Blob([f.content]).size, 0);
   if (totalBytes > HARD_SIZE_LIMIT) {
     return showStatus('error', 'الحجم ' + fmtSize(totalBytes) + ' تجاوز الحد ١٠٠ ميجا');
@@ -855,10 +888,12 @@ async function publish() {
       await publishMultiFile(files, msg);
     }
 
+    // Success
     showStatus('success', files.length === 1
       ? 'تم نشر ' + files[0].path
       : 'تم نشر ' + files.length + ' ملفات بنجاح');
 
+    // Log
     addLogEntry({
       paths: files.map(f => f.path),
       msg,
@@ -866,13 +901,16 @@ async function publish() {
       count: files.length
     });
 
+    // Recent
     files.forEach(f => addRecent(f.path));
 
+    // Clear form
     files = [];
     $('msgInput').value = '';
     addFileRow();
     clearDraft();
 
+    // Refresh browser if visible
     if (mode === 'edit') browse(currentBrowsePath);
 
   } catch (e) {
@@ -962,6 +1000,7 @@ async function loadFileIntoNewRow(path) {
   showStatus('loading', 'جاري تحميل ' + path);
   try {
     const { content, sha } = await getFileContent(path);
+    // If first row is empty, replace it; else append
     if (files.length === 1 && !files[0].path && !files[0].content) {
       files[0] = { path, content, sha, isExisting: true };
     } else {
@@ -988,6 +1027,7 @@ async function browse(path) {
       list.innerHTML = '<div class="browser-empty">مجلد فارغ</div>';
       return;
     }
+    // Sort: dirs first, then by name
     items.sort((a, b) => {
       if (a.type !== b.type) return a.type === 'dir' ? -1 : 1;
       return a.name.localeCompare(b.name);
@@ -1016,7 +1056,7 @@ async function onBrowserItemClick(item) {
     browse(item.path);
   } else {
     await loadFileIntoNewRow(item.path);
-    setMode('new');
+    setMode('new'); // Switch back to editor view to show loaded content
   }
 }
 
@@ -1043,6 +1083,7 @@ function handleAttach(event) {
   const reader = new FileReader();
   reader.onload = e => {
     const content = e.target.result;
+    // If first row is empty, replace it; else append
     if (files.length === 1 && !files[0].path && !files[0].content) {
       files[0] = { path: file.name, content, sha: null, isExisting: false };
     } else {
@@ -1053,11 +1094,12 @@ function handleAttach(event) {
   };
   reader.onerror = () => showStatus('error', 'فشل قراءة الملف');
   reader.readAsText(file);
-  event.target.value = '';
+  event.target.value = ''; // Reset so same file can be picked again
 }
 
 /* ============ AUTO-SAVE DRAFT ============ */
 function saveDraft() {
+  // Only save if there's actual content
   const hasContent = files.some(f => f.content && f.content.length > 0);
   if (!hasContent) return;
   const payload = {
@@ -1089,6 +1131,7 @@ function maybeRestoreDraft() {
     clearDraft();
     return;
   }
+  // Don't prompt if all files are empty
   if (!draft.files.some(f => f.content && f.content.length > 0)) return;
   const ageMins = Math.round(age / 60000);
   const ageStr = ageMins < 60 ? (ageMins + ' دقيقة') : (Math.round(ageMins / 60) + ' ساعة');
@@ -1114,6 +1157,7 @@ function startDraftTimer() {
 
 /* ============ INIT ============ */
 function init() {
+  // Listeners
   $('lockForm').addEventListener('submit', unlock);
   $('patInput').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(e); });
   $('logoutBtn').addEventListener('click', logout);
@@ -1127,10 +1171,12 @@ function init() {
   $('browserBack').addEventListener('click', browserBack);
   $('recentClearBtn').addEventListener('click', clearRecent);
 
+  // Initial state
   if (files.length === 0) addFileRow();
   renderLogs();
   renderRecent();
 
+  // Restore session
   if (PAT && username) {
     $('userBadge').textContent = username;
     $('lockScreen').classList.add('hidden');
@@ -1142,3 +1188,4 @@ init();
 </script>
 </body>
 </html>
+

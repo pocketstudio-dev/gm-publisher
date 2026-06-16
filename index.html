@@ -65,6 +65,8 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 .icon-btn{width:34px;height:34px;border-radius:10px;background:var(--surface-input);border:1px solid var(--hairline);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-secondary);transition:all 200ms var(--ease);padding:0}
 .icon-btn:active{transform:scale(0.92)}
 .icon-btn:hover{color:var(--ink-primary);border-color:rgba(196,165,114,0.3)}
+.icon-btn.spinning{color:var(--accent);border-color:rgba(196,165,114,0.4)}
+.icon-btn.spinning svg{animation:spin 0.7s linear infinite}
 .icon-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;fill:none}
 .topbar-status{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--success-soft);border:1px solid rgba(110,231,183,0.15);border-radius:999px;cursor:pointer}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);animation:pulse 2s var(--ease) infinite}
@@ -1308,12 +1310,37 @@ function startDraftTimer() {
   draftTimer = setInterval(saveDraft, DRAFT_SAVE_INTERVAL);
 }
 
-/* ============ REFRESH ============ */
-function refreshApp() {
-  // Save current draft before reload
-  saveDraft();
-  // Hard reload to bypass cache
-  location.reload();
+/* ============ HARD REFRESH ============ */
+async function refreshApp() {
+  const btn = $('refreshBtn');
+  if (btn) {
+    btn.style.pointerEvents = 'none';
+    btn.classList.add('spinning');
+  }
+
+  // 1. Save current draft before any reload
+  try { saveDraft(); } catch {}
+
+  // 2. Clear Cache API (covers most fetch-based caches)
+  if ('caches' in window) {
+    try {
+      const names = await caches.keys();
+      await Promise.all(names.map(n => caches.delete(n)));
+    } catch (e) { console.warn('Cache clear failed:', e); }
+  }
+
+  // 3. Unregister any service workers (defensive)
+  if ('serviceWorker' in navigator) {
+    try {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+    } catch (e) { console.warn('SW unregister failed:', e); }
+  }
+
+  // 4. Cache-bust URL — forces browser + CDN to fetch fresh copy
+  const url = new URL(window.location.href);
+  url.searchParams.set('v', Date.now());
+  window.location.replace(url.toString());
 }
 
 /* ============ INIT ============ */

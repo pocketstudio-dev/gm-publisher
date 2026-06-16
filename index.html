@@ -102,10 +102,27 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 .browser{margin:0 16px 12px;padding:6px;background:var(--surface-outer);border:1px solid var(--hairline);border-radius:18px;display:none}
 .browser.show{display:block}
 .browser-inner{background:var(--surface-inner);border:1px solid var(--hairline);border-radius:14px;overflow:hidden}
-.browser-path{padding:12px 16px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:12px;color:var(--ink-secondary);direction:ltr}
-.browser-path-back{background:none;border:none;color:var(--accent);cursor:pointer;padding:2px 6px;font-size:14px}
-.browser-path-back.hidden{display:none}
-.browser-list{max-height:240px;overflow-y:auto}
+
+/* Browser's own repo selector */
+.browser-repo-row{padding:12px 14px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:8px;background:var(--surface-input)}
+.browser-repo-label{font-size:10px;font-weight:500;color:var(--ink-secondary);letter-spacing:0.04em;text-transform:uppercase;flex-shrink:0}
+.browser-repo-input{flex:1;min-width:0;padding:7px 10px;background:var(--bg-base);border:1px solid var(--hairline);border-radius:8px;font-family:var(--font-mono);font-size:12px;color:var(--ink-primary);direction:ltr;text-align:left;transition:border-color 200ms var(--ease)}
+.browser-repo-input:focus{outline:none;border-color:rgba(196,165,114,0.3);box-shadow:0 0 0 3px var(--accent-soft)}
+.browser-refresh-btn{width:30px;height:30px;border-radius:8px;background:none;border:1px solid var(--hairline);display:flex;align-items:center;justify-content:center;color:var(--ink-secondary);cursor:pointer;flex-shrink:0;padding:0;transition:all 200ms var(--ease)}
+.browser-refresh-btn:active{transform:scale(0.92) rotate(-180deg)}
+.browser-refresh-btn:hover{color:var(--accent);border-color:rgba(196,165,114,0.3)}
+.browser-refresh-btn.loading svg{animation:spin 0.8s linear infinite}
+.browser-refresh-btn svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
+
+/* Breadcrumb */
+.breadcrumb{padding:10px 16px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-family:var(--font-mono);font-size:12px;direction:ltr;min-height:38px}
+.breadcrumb-item{display:inline-flex;align-items:center;background:none;border:none;color:var(--accent);padding:4px 8px;border-radius:6px;cursor:pointer;font-family:var(--font-mono);font-size:12px;transition:background 150ms var(--ease)}
+.breadcrumb-item:hover{background:var(--accent-soft)}
+.breadcrumb-item:active{transform:scale(0.97)}
+.breadcrumb-item.current{color:var(--ink-primary);cursor:default;background:none!important}
+.breadcrumb-sep{color:var(--ink-quaternary);font-size:11px;padding:0 2px;user-select:none}
+
+.browser-list{max-height:280px;overflow-y:auto}
 .browser-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--hairline);cursor:pointer;transition:background 150ms var(--ease)}
 .browser-item:last-child{border-bottom:none}
 .browser-item:hover{background:var(--highlight)}
@@ -336,10 +353,30 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
   <!-- FILE BROWSER (edit mode) -->
   <section class="browser" id="browserSection">
     <div class="browser-inner">
-      <div class="browser-path">
-        <button type="button" class="browser-path-back hidden" id="browserBack">← رجوع</button>
-        <span id="browserPath">pocket-studio/</span>
+
+      <!-- Browser's own repo field -->
+      <div class="browser-repo-row">
+        <label class="browser-repo-label" for="browserRepoInput">تصفح من</label>
+        <input type="text" class="browser-repo-input" id="browserRepoInput"
+               value="pocketstudio-dev/pocket-studio"
+               placeholder="owner/repo"
+               dir="ltr"
+               spellcheck="false"
+               autocapitalize="off"
+               autocorrect="off">
+        <button type="button" class="browser-refresh-btn" id="browserRefreshBtn" title="تحديث">
+          <svg viewBox="0 0 24 24">
+            <polyline points="23 4 23 10 17 10"/>
+            <polyline points="1 20 1 14 7 14"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+        </button>
       </div>
+
+      <!-- Breadcrumb navigation -->
+      <div class="breadcrumb" id="breadcrumb"></div>
+
+      <!-- File list -->
       <div class="browser-list" id="browserList">
         <div class="browser-loading">
           <span class="spinner"></span>
@@ -353,9 +390,9 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
   <section class="shell">
     <div class="core">
 
-      <!-- REPO ROW (editable) -->
+      <!-- EDITOR REPO ROW (target for publishing) -->
       <div class="repo-row">
-        <label class="repo-row-label" for="repoInput">المستودع</label>
+        <label class="repo-row-label" for="repoInput">نشر إلى</label>
         <input type="text" class="repo-input" id="repoInput"
                value="pocketstudio-dev/pocket-studio"
                placeholder="owner/repo"
@@ -427,8 +464,17 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 
 /* ============ CONSTANTS ============ */
 const DEFAULT_REPO = 'pocketstudio-dev/pocket-studio';
+
+// EDITOR repo (where files get published)
 function REPO() {
   const input = document.getElementById('repoInput');
+  const v = input && input.value ? input.value.trim() : '';
+  return v || DEFAULT_REPO;
+}
+
+// BROWSER repo (where files are listed/loaded from)
+function BROWSER_REPO() {
+  const input = document.getElementById('browserRepoInput');
   const v = input && input.value ? input.value.trim() : '';
   return v || DEFAULT_REPO;
 }
@@ -586,14 +632,14 @@ async function validatePAT(token) {
 }
 
 async function listContents(path) {
-  const url = '/repos/' + REPO() + '/contents/' + encodeURIComponent(path).replace(/%2F/g, '/');
+  const url = '/repos/' + BROWSER_REPO() + '/contents/' + encodeURIComponent(path).replace(/%2F/g, '/');
   const r = await ghFetch(url);
   if (!r.ok) throw new Error(patErrorMsg(r.status, r.data));
   return Array.isArray(r.data) ? r.data : [r.data];
 }
 
 async function getFileContent(path) {
-  const url = '/repos/' + REPO() + '/contents/' + encodeURIComponent(path).replace(/%2F/g, '/');
+  const url = '/repos/' + BROWSER_REPO() + '/contents/' + encodeURIComponent(path).replace(/%2F/g, '/');
   const r = await ghFetch(url);
   if (!r.ok) throw new Error(patErrorMsg(r.status, r.data));
   if (Array.isArray(r.data)) throw new Error('المسار مجلد وليس ملف');
@@ -1052,12 +1098,40 @@ async function loadFileIntoNewRow(path) {
 }
 
 /* ============ FILE BROWSER ============ */
+function renderBreadcrumb(path) {
+  const repo = BROWSER_REPO();
+  // Get just the repo name (after the /)
+  const repoName = repo.includes('/') ? repo.split('/')[1] : repo;
+  const bc = $('breadcrumb');
+  bc.innerHTML = '';
+
+  // Root crumb (always present)
+  const rootBtn = el('button', {
+    type: 'button',
+    class: 'breadcrumb-item' + (!path ? ' current' : ''),
+    onClick: () => browse('')
+  }, repoName);
+  bc.appendChild(rootBtn);
+
+  if (!path) return;
+
+  const parts = path.split('/').filter(Boolean);
+  parts.forEach((part, idx) => {
+    bc.appendChild(el('span', { class: 'breadcrumb-sep' }, '/'));
+    const isLast = idx === parts.length - 1;
+    const pathToHere = parts.slice(0, idx + 1).join('/');
+    const crumb = el('button', {
+      type: 'button',
+      class: 'breadcrumb-item' + (isLast ? ' current' : ''),
+      onClick: isLast ? null : (() => browse(pathToHere))
+    }, part);
+    bc.appendChild(crumb);
+  });
+}
+
 async function browse(path) {
   currentBrowsePath = path;
-  const display = path ? ('pocket-studio/' + path) : 'pocket-studio/';
-  $('browserPath').textContent = display;
-  // Show back button only when inside a folder
-  $('browserBack').classList.toggle('hidden', !path);
+  renderBreadcrumb(path);
   const list = $('browserList');
   list.innerHTML = '<div class="browser-loading"><span class="spinner"></span><span>جاري التحميل...</span></div>';
   try {
@@ -1094,17 +1168,36 @@ async function onBrowserItemClick(item) {
   if (item.type === 'dir') {
     browse(item.path);
   } else {
-    // Load file but STAY in browser tab so user can navigate to other files
+    // Sync editor repo with browser repo BEFORE loading
+    syncEditorRepo();
     await loadFileIntoNewRow(item.path);
     showStatus('success', 'تم تحميل ' + item.path + ' • انتقل لتاب "ملف جديد" للتحرير');
   }
 }
 
-function browserBack() {
-  if (!currentBrowsePath) return;
-  const parts = currentBrowsePath.split('/').filter(Boolean);
-  parts.pop();
-  browse(parts.join('/'));
+/* Sync editor repo input with current browser repo */
+function syncEditorRepo() {
+  const browserRepo = BROWSER_REPO();
+  const editorInput = $('repoInput');
+  if (editorInput) editorInput.value = browserRepo;
+}
+
+/* Debounced browser refresh on repo change */
+let _repoChangeTimer = null;
+function onBrowserRepoChange() {
+  clearTimeout(_repoChangeTimer);
+  _repoChangeTimer = setTimeout(() => {
+    // Reset to root when repo changes
+    browse('');
+  }, 600);
+}
+
+function manualBrowserRefresh() {
+  const btn = $('browserRefreshBtn');
+  btn.classList.add('loading');
+  browse(currentBrowsePath).finally(() => {
+    setTimeout(() => btn.classList.remove('loading'), 400);
+  });
 }
 
 /* ============ MODE / TABS ============ */
@@ -1237,7 +1330,8 @@ function init() {
   $('fileInput').addEventListener('change', handleAttach);
   $('tabNew').addEventListener('click', () => setMode('new'));
   $('tabEdit').addEventListener('click', () => setMode('edit'));
-  $('browserBack').addEventListener('click', browserBack);
+  $('browserRepoInput').addEventListener('input', onBrowserRepoChange);
+  $('browserRefreshBtn').addEventListener('click', manualBrowserRefresh);
   $('recentClearBtn').addEventListener('click', clearRecent);
   $('draftRestoreBtn').addEventListener('click', restoreDraft);
   $('draftDismissBtn').addEventListener('click', dismissDraft);

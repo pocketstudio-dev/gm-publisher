@@ -104,7 +104,7 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 .browser-inner{background:var(--surface-inner);border:1px solid var(--hairline);border-radius:14px;overflow:hidden}
 .browser-path{padding:12px 16px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:12px;color:var(--ink-secondary);direction:ltr}
 .browser-path-back{background:none;border:none;color:var(--accent);cursor:pointer;padding:2px 6px;font-size:14px}
-.browser-path-back:disabled{color:var(--ink-quaternary);cursor:not-allowed}
+.browser-path-back.hidden{display:none}
 .browser-list{max-height:240px;overflow-y:auto}
 .browser-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--hairline);cursor:pointer;transition:background 150ms var(--ease)}
 .browser-item:last-child{border-bottom:none}
@@ -275,14 +275,14 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
       </div>
     </div>
     <div class="topbar-actions">
-      <button class="icon-btn" id="refreshBtn" title="تحديث الأداة">
+      <button type="button" class="icon-btn" id="refreshBtn" title="تحديث الأداة">
         <svg viewBox="0 0 24 24">
           <polyline points="23 4 23 10 17 10"/>
           <polyline points="1 20 1 14 7 14"/>
           <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
         </svg>
       </button>
-      <button class="icon-btn" id="renderBtn" title="افتح Render Dashboard">
+      <button type="button" class="icon-btn" id="renderBtn" title="افتح Render Dashboard">
         <svg viewBox="0 0 24 24">
           <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
           <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
@@ -312,8 +312,8 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
         مسودة محفوظة من <strong id="draftAge">قبل قليل</strong> (<span id="draftCount">١</span> ملف)
       </div>
       <div class="draft-prompt-actions">
-        <button class="draft-btn" id="draftDismissBtn">تجاهل</button>
-        <button class="draft-btn primary" id="draftRestoreBtn">استرجاع</button>
+        <button type="button" class="draft-btn" id="draftDismissBtn">تجاهل</button>
+        <button type="button" class="draft-btn primary" id="draftRestoreBtn">استرجاع</button>
       </div>
     </div>
   </section>
@@ -322,22 +322,22 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
   <section class="recent" id="recentSection">
     <div class="recent-header">
       <span class="recent-label">آخر الملفات</span>
-      <button class="recent-clear" id="recentClearBtn">مسح</button>
+      <button type="button" class="recent-clear" id="recentClearBtn">مسح</button>
     </div>
     <div class="recent-chips" id="recentChips"></div>
   </section>
 
   <!-- MODE TABS -->
   <div class="tabs">
-    <button class="tab active" data-mode="new" id="tabNew">ملف جديد</button>
-    <button class="tab" data-mode="edit" id="tabEdit">تصفح وتعديل</button>
+    <button type="button" class="tab active" data-mode="new" id="tabNew">ملف جديد</button>
+    <button type="button" class="tab" data-mode="edit" id="tabEdit">تصفح وتعديل</button>
   </div>
 
   <!-- FILE BROWSER (edit mode) -->
   <section class="browser" id="browserSection">
     <div class="browser-inner">
       <div class="browser-path">
-        <button class="browser-path-back" id="browserBack" disabled>← رجوع</button>
+        <button type="button" class="browser-path-back hidden" id="browserBack">← رجوع</button>
         <span id="browserPath">pocket-studio/</span>
       </div>
       <div class="browser-list" id="browserList">
@@ -370,11 +370,11 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 
       <!-- ADD ACTIONS -->
       <div class="add-actions">
-        <button class="add-btn" id="addFileBtn">
+        <button type="button" class="add-btn" id="addFileBtn">
           <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
           <span>إضافة ملف</span>
         </button>
-        <button class="add-btn" id="attachFileBtn">
+        <button type="button" class="add-btn" id="attachFileBtn">
           <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
           <span>إرفاق من الآيفون</span>
         </button>
@@ -391,7 +391,7 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 
       <!-- ACTIONS -->
       <div class="actions">
-        <button class="btn btn-primary" id="publishBtn">
+        <button type="button" class="btn btn-primary" id="publishBtn">
           <span id="publishBtnText">نشر إلى GitHub</span>
           <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
@@ -1056,7 +1056,8 @@ async function browse(path) {
   currentBrowsePath = path;
   const display = path ? ('pocket-studio/' + path) : 'pocket-studio/';
   $('browserPath').textContent = display;
-  $('browserBack').disabled = !path;
+  // Show back button only when inside a folder
+  $('browserBack').classList.toggle('hidden', !path);
   const list = $('browserList');
   list.innerHTML = '<div class="browser-loading"><span class="spinner"></span><span>جاري التحميل...</span></div>';
   try {

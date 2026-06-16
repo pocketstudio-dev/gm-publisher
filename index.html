@@ -18,6 +18,9 @@
 /* Allow text selection & native callout ONLY in input fields */
 input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 
+/* iOS: prevent auto-zoom when focusing inputs (requires min font-size 16px) */
+input,textarea,select{font-size:16px!important}
+
 :root{
   --bg-base:#050505;--bg-elevated:#0A0A0C;
   --surface-outer:#0F0F12;--surface-inner:#15151A;--surface-input:#1A1A20;
@@ -424,6 +427,23 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
     </div>
   </section>
 
+  <!-- DELETE CONFIRM BANNER -->
+  <section class="publish-confirm-banner" id="deleteConfirmBanner" style="border-color:rgba(252,165,165,0.3)">
+    <div class="publish-confirm-inner" style="background:var(--error-soft);border-color:rgba(252,165,165,0.2)">
+      <div class="publish-confirm-icon" style="background:rgba(252,165,165,0.15);border-color:rgba(252,165,165,0.3);color:var(--error)">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
+      </div>
+      <div class="publish-confirm-text">
+        <strong style="color:var(--error)">تأكيد الحذف</strong>
+        <div id="deleteConfirmDetails">سوف يتم حذف الملف</div>
+      </div>
+      <div class="publish-confirm-actions">
+        <button type="button" class="draft-btn" id="deleteConfirmCancel">إلغاء</button>
+        <button type="button" class="draft-btn primary" id="deleteConfirmYes" style="background:linear-gradient(180deg,#FCA5A5,#DC2626);color:#fff">تأكيد الحذف</button>
+      </div>
+    </div>
+  </section>
+
   <!-- PUBLISH CONFIRM BANNER (multi-file) -->
   <section class="publish-confirm-banner" id="publishConfirmBanner">
     <div class="publish-confirm-inner">
@@ -595,7 +615,7 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 'use strict';
 
 /* ============ CONSTANTS ============ */
-const VERSION = 'v0.2.9';
+const VERSION = 'v0.2.10';
 const DEFAULT_REPO = 'pocketstudio-dev/pocket-studio';
 const SEED_REPOS = ['pocketstudio-dev/pocket-studio', 'pocketstudio-dev/gm-publisher'];
 
@@ -1437,8 +1457,27 @@ async function browse(path) {
 }
 
 /* Delete file from GitHub (called by inline delete button) */
-async function handleDeleteFile(item) {
-  if (!confirm('حذف ' + item.path + ' من ' + BROWSER_REPO() + '؟\n\nهذا الإجراء يحذف الملف من GitHub ولا يمكن التراجع عنه.')) return;
+let _pendingDeleteItem = null;
+function handleDeleteFile(item) {
+  // Show non-blocking confirm banner instead of native confirm()
+  _pendingDeleteItem = item;
+  const details = $('deleteConfirmDetails');
+  details.innerHTML = 'حذف <strong style="color:var(--error)">' + escapeHtml(item.path) + '</strong> من '
+    + '<span style="font-family:var(--font-mono);font-size:11px;direction:ltr">' + escapeHtml(BROWSER_REPO()) + '</span>'
+    + '<br><span style="color:var(--ink-tertiary);font-size:11px">هذا الإجراء لا يمكن التراجع عنه</span>';
+  $('deleteConfirmBanner').classList.add('show');
+  $('deleteConfirmBanner').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function hideDeleteConfirm() {
+  $('deleteConfirmBanner').classList.remove('show');
+  _pendingDeleteItem = null;
+}
+
+async function executeDelete() {
+  const item = _pendingDeleteItem;
+  hideDeleteConfirm();
+  if (!item) return;
   showStatus('loading', 'جاري حذف ' + item.path);
   try {
     const result = await deleteFile(item.path);
@@ -1829,6 +1868,10 @@ function init() {
   // Publish confirm
   $('publishConfirmYes').addEventListener('click', executePublish);
   $('publishConfirmCancel').addEventListener('click', hidePublishConfirm);
+
+  // Delete confirm
+  $('deleteConfirmYes').addEventListener('click', executeDelete);
+  $('deleteConfirmCancel').addEventListener('click', hideDeleteConfirm);
 
   // Recent + draft
   $('recentClearBtn').addEventListener('click', clearRecent);

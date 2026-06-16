@@ -100,6 +100,69 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 .tab.active{background:var(--surface-inner);color:var(--ink-primary);box-shadow:0 1px 3px rgba(0,0,0,0.2)}
 .tab:active{transform:scale(0.98)}
 
+/* ============ REPO SELECTORS & MANAGEMENT ============ */
+.repo-select{flex:1;min-width:0;padding:7px 10px;background:var(--bg-base);border:1px solid var(--hairline);border-radius:8px;font-family:var(--font-mono);font-size:12px;color:var(--ink-primary);direction:ltr;text-align:left;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23C4A572' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 10px center;padding-left:28px}
+.repo-select:focus{outline:none;border-color:rgba(196,165,114,0.3);box-shadow:0 0 0 3px var(--accent-soft)}
+.repo-action-btn{width:30px;height:30px;border-radius:8px;background:none;border:1px solid var(--hairline);display:flex;align-items:center;justify-content:center;color:var(--ink-secondary);cursor:pointer;flex-shrink:0;padding:0;transition:all 200ms var(--ease)}
+.repo-action-btn:active{transform:scale(0.92)}
+.repo-action-btn:hover{color:var(--accent);border-color:rgba(196,165,114,0.3)}
+.repo-action-btn svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
+
+/* Branch row */
+.branch-row{padding:12px 20px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.branch-input{flex:0 0 auto;width:120px;padding:7px 10px;background:var(--surface-input);border:1px solid var(--hairline);border-radius:8px;font-family:var(--font-mono);font-size:12px;color:var(--ink-primary);text-align:left;transition:border-color 200ms var(--ease)}
+.branch-input:focus{outline:none;border-color:rgba(196,165,114,0.3);box-shadow:0 0 0 3px var(--accent-soft)}
+.branch-hint{font-size:10px;color:var(--ink-tertiary);flex:1;min-width:100%;margin-top:4px}
+
+/* Management banners */
+.repo-mgmt-banner{margin:0 16px 12px;padding:6px;background:var(--surface-outer);border:1px solid rgba(196,165,114,0.25);border-radius:18px;display:none}
+.repo-mgmt-banner.show{display:block;animation:slideDown 300ms var(--ease)}
+.repo-mgmt-inner{background:var(--surface-inner);border:1px solid var(--hairline);border-radius:14px;padding:18px}
+.repo-mgmt-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.repo-mgmt-title{font-family:var(--font-display);font-size:16px;font-weight:500;color:var(--ink-primary);margin:0}
+.repo-mgmt-close{width:28px;height:28px;border-radius:8px;background:none;border:1px solid var(--hairline);color:var(--ink-secondary);font-size:18px;font-weight:400;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0}
+.repo-mgmt-close:hover{color:var(--error);border-color:rgba(252,165,165,0.3)}
+.repo-mgmt-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.repo-mgmt-hint{font-size:11px;color:var(--ink-tertiary);text-align:center;margin-top:12px}
+.repo-list{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto}
+.repo-list-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface-input);border:1px solid var(--hairline);border-radius:10px}
+.repo-list-name{flex:1;font-family:var(--font-mono);font-size:12px;color:var(--ink-primary);direction:ltr;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.repo-list-delete{width:28px;height:28px;border-radius:8px;background:none;border:1px solid var(--hairline);color:var(--ink-tertiary);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0}
+.repo-list-delete:hover{color:var(--error);border-color:rgba(252,165,165,0.3);background:var(--error-soft)}
+.repo-list-delete svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
+.repo-list-empty{padding:20px;text-align:center;color:var(--ink-tertiary);font-size:12px}
+
+/* Publish confirm banner */
+.publish-confirm-banner{margin:0 16px 12px;padding:6px;background:var(--surface-outer);border:1px solid rgba(252,211,77,0.3);border-radius:18px;display:none}
+.publish-confirm-banner.show{display:block;animation:slideDown 300ms var(--ease)}
+.publish-confirm-inner{background:var(--warn-soft);border:1px solid rgba(252,211,77,0.2);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.publish-confirm-icon{width:32px;height:32px;border-radius:10px;background:rgba(252,211,77,0.15);border:1px solid rgba(252,211,77,0.3);display:flex;align-items:center;justify-content:center;color:var(--warn);flex-shrink:0}
+.publish-confirm-icon svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
+.publish-confirm-text{flex:1;min-width:140px;font-size:12px;color:var(--ink-primary);line-height:1.5}
+.publish-confirm-text strong{display:block;color:var(--warn);font-weight:600;margin-bottom:2px}
+.publish-confirm-actions{display:flex;gap:8px;flex-shrink:0}
+
+/* Browser file size display */
+.browser-name-row{flex:1;display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+.browser-file-size{font-family:var(--font-mono);font-size:10px;color:var(--ink-quaternary);direction:ltr;flex-shrink:0}
+
+/* Log item link styling */
+.log-item-link{cursor:pointer;transition:background 150ms var(--ease)}
+.log-item-link:hover{background:var(--highlight)}
+.log-item-link:active{background:var(--accent-soft)}
+
+/* Version badge in topbar */
+.version-badge{font-family:var(--font-mono);font-size:9px;font-weight:500;color:var(--accent);background:var(--accent-soft);padding:2px 6px;border-radius:6px;letter-spacing:0.04em;direction:ltr;margin-right:6px}
+
+/* Long-press menu for browser items */
+.context-menu{position:fixed;background:var(--surface-outer);border:1px solid var(--hairline);border-radius:12px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,0.6);z-index:1000;min-width:160px;display:none}
+.context-menu.show{display:block;animation:slideDown 200ms var(--ease)}
+.context-menu-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:none;border:none;border-radius:8px;width:100%;color:var(--ink-primary);font-family:var(--font-body);font-size:13px;cursor:pointer;text-align:right;direction:rtl}
+.context-menu-item:hover{background:var(--highlight)}
+.context-menu-item.danger{color:var(--error)}
+.context-menu-item.danger:hover{background:var(--error-soft)}
+.context-menu-item svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
+
 /* ============ FILE BROWSER ============ */
 .browser{margin:0 16px 12px;padding:6px;background:var(--surface-outer);border:1px solid var(--hairline);border-radius:18px;display:none}
 .browser.show{display:block}
@@ -291,6 +354,7 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
       <div>
         <span class="brand-name">GrabMultid</span>
         <span class="brand-sub">/ publisher</span>
+        <span class="version-badge" id="versionBadge">v0.0.0</span>
       </div>
     </div>
     <div class="topbar-actions">
@@ -320,6 +384,53 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
     <h1 class="hero-title">انشر الكود إلى <em>pocket-studio</em></h1>
     <p class="hero-sub">ملف واحد أو عدة ملفات في commit واحد. تعديل، إرفاق، تصفح.</p>
   </header>
+
+  <!-- ADD REPO BANNER -->
+  <section class="repo-mgmt-banner" id="addRepoBanner">
+    <div class="repo-mgmt-inner">
+      <div class="repo-mgmt-header">
+        <h3 class="repo-mgmt-title">إضافة مستودع جديد</h3>
+        <button type="button" class="repo-mgmt-close" id="addRepoClose" title="إغلاق">×</button>
+      </div>
+      <input type="text" class="input" id="newRepoInput"
+             placeholder="owner/repo"
+             dir="ltr" spellcheck="false"
+             autocapitalize="off" autocorrect="off">
+      <div class="repo-mgmt-actions">
+        <button type="button" class="draft-btn" id="addRepoCancel">إلغاء</button>
+        <button type="button" class="draft-btn primary" id="addRepoSave">إضافة</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANAGE REPOS BANNER -->
+  <section class="repo-mgmt-banner" id="manageRepoBanner">
+    <div class="repo-mgmt-inner">
+      <div class="repo-mgmt-header">
+        <h3 class="repo-mgmt-title">إدارة المستودعات</h3>
+        <button type="button" class="repo-mgmt-close" id="manageRepoClose" title="إغلاق">×</button>
+      </div>
+      <div class="repo-list" id="manageRepoList"></div>
+      <div class="repo-mgmt-hint">اضغط 🗑 لحذف مستودع من القائمة (لا يحذف من GitHub)</div>
+    </div>
+  </section>
+
+  <!-- PUBLISH CONFIRM BANNER (multi-file) -->
+  <section class="publish-confirm-banner" id="publishConfirmBanner">
+    <div class="publish-confirm-inner">
+      <div class="publish-confirm-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+      </div>
+      <div class="publish-confirm-text">
+        <strong>تأكيد النشر</strong>
+        <div id="publishConfirmDetails">سوف تنشر عدة ملفات</div>
+      </div>
+      <div class="publish-confirm-actions">
+        <button type="button" class="draft-btn" id="publishConfirmCancel">إلغاء</button>
+        <button type="button" class="draft-btn primary" id="publishConfirmYes">تأكيد النشر</button>
+      </div>
+    </div>
+  </section>
 
   <!-- DRAFT RESTORE BANNER (shows only after PAT auth) -->
   <section class="draft-prompt" id="draftPrompt">
@@ -356,16 +467,16 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
   <section class="browser" id="browserSection">
     <div class="browser-inner">
 
-      <!-- Browser's own repo field -->
+      <!-- Browser's repo selector (dropdown) -->
       <div class="browser-repo-row">
-        <label class="browser-repo-label" for="browserRepoInput">تصفح من</label>
-        <input type="text" class="browser-repo-input" id="browserRepoInput"
-               value="pocketstudio-dev/pocket-studio"
-               placeholder="owner/repo"
-               dir="ltr"
-               spellcheck="false"
-               autocapitalize="off"
-               autocorrect="off">
+        <label class="browser-repo-label" for="browserRepoSelect">تصفح من</label>
+        <select class="repo-select" id="browserRepoSelect" dir="ltr"></select>
+        <button type="button" class="repo-action-btn" id="addRepoBtn1" title="إضافة مستودع">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button type="button" class="repo-action-btn" id="manageRepoBtn1" title="إدارة المستودعات">
+          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
         <button type="button" class="browser-refresh-btn" id="browserRefreshBtn" title="تحديث">
           <svg viewBox="0 0 24 24">
             <polyline points="23 4 23 10 17 10"/>
@@ -392,16 +503,26 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
   <section class="shell">
     <div class="core">
 
-      <!-- EDITOR REPO ROW (target for publishing) -->
+      <!-- EDITOR REPO + BRANCH ROW (target for publishing) -->
       <div class="repo-row">
-        <label class="repo-row-label" for="repoInput">نشر إلى</label>
-        <input type="text" class="repo-input" id="repoInput"
-               value="pocketstudio-dev/pocket-studio"
-               placeholder="owner/repo"
-               dir="ltr"
-               spellcheck="false"
-               autocapitalize="off"
-               autocorrect="off">
+        <label class="repo-row-label" for="repoSelect">نشر إلى</label>
+        <select class="repo-select" id="repoSelect" dir="ltr"></select>
+        <button type="button" class="repo-action-btn" id="addRepoBtn2" title="إضافة مستودع">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button type="button" class="repo-action-btn" id="manageRepoBtn2" title="إدارة المستودعات">
+          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+      </div>
+
+      <!-- BRANCH ROW -->
+      <div class="branch-row">
+        <label class="repo-row-label" for="branchInput">الفرع</label>
+        <input type="text" class="branch-input" id="branchInput"
+               value="main" placeholder="main"
+               dir="ltr" spellcheck="false"
+               autocapitalize="off" autocorrect="off">
+        <span class="branch-hint">⚠️ غيّره فقط لو المستودع يستخدم master أو فرع آخر</span>
       </div>
 
       <!-- FILE ROWS (dynamic) -->
@@ -461,24 +582,45 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
   <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
 </div>
 
+<!-- CONTEXT MENU (for browser file long-press) -->
+<div class="context-menu" id="ctxMenu">
+  <button type="button" class="context-menu-item" id="ctxLoadBtn">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span>تحميل للتعديل</span>
+  </button>
+  <button type="button" class="context-menu-item danger" id="ctxDeleteBtn">
+    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
+    <span>حذف من GitHub</span>
+  </button>
+</div>
+
 <script>
 'use strict';
 
 /* ============ CONSTANTS ============ */
+const VERSION = 'v0.2.6';
 const DEFAULT_REPO = 'pocketstudio-dev/pocket-studio';
+const SEED_REPOS = ['pocketstudio-dev/pocket-studio', 'pocketstudio-dev/gm-publisher'];
 
 // EDITOR repo (where files get published)
 function REPO() {
-  const input = document.getElementById('repoInput');
-  const v = input && input.value ? input.value.trim() : '';
+  const sel = document.getElementById('repoSelect');
+  const v = sel && sel.value ? sel.value.trim() : '';
   return v || DEFAULT_REPO;
 }
 
 // BROWSER repo (where files are listed/loaded from)
 function BROWSER_REPO() {
-  const input = document.getElementById('browserRepoInput');
-  const v = input && input.value ? input.value.trim() : '';
+  const sel = document.getElementById('browserRepoSelect');
+  const v = sel && sel.value ? sel.value.trim() : '';
   return v || DEFAULT_REPO;
+}
+
+// Branch for publishing
+function BRANCH() {
+  const inp = document.getElementById('branchInput');
+  const v = inp && inp.value ? inp.value.trim() : '';
+  return v || 'main';
 }
 const MAX_LOGS = 50;
 const MAX_RECENT = 5;
@@ -651,42 +793,49 @@ async function getFileContent(path) {
 
 /* Single file publish (uses Contents API) */
 async function publishSingleFile(file, message) {
+  const branch = BRANCH();
   const url = '/repos/' + REPO() + '/contents/' + encodeURIComponent(file.path).replace(/%2F/g, '/');
   let sha = file.sha;
   if (!sha) {
-    // Try to fetch existing SHA
+    // Try to fetch existing SHA from current branch
     try {
-      const r = await ghFetch(url);
+      const r = await ghFetch(url + '?ref=' + encodeURIComponent(branch));
       if (r.ok && !Array.isArray(r.data)) sha = r.data.sha;
     } catch {}
   }
   const body = {
     message,
     content: b64encode(file.content),
-    branch: 'main'
+    branch
   };
   if (sha) body.sha = sha;
   const r = await ghFetch(url, { method: 'PUT', body: JSON.stringify(body) });
   if (!r.ok) throw new Error(patErrorMsg(r.status, r.data));
-  return r.data;
+  // Return commit URL for log linking
+  return {
+    commitUrl: r.data?.commit?.html_url || null,
+    commitSha: r.data?.commit?.sha || null
+  };
 }
 
 /* Multi-file publish (uses Git Data API) */
 async function publishMultiFile(filesArr, message) {
-  // 1. Get current main ref
-  const refR = await ghFetch('/repos/' + REPO() + '/git/ref/heads/main');
+  const branch = BRANCH();
+  const repo = REPO();
+  // 1. Get current branch ref
+  const refR = await ghFetch('/repos/' + repo + '/git/ref/heads/' + encodeURIComponent(branch));
   if (!refR.ok) throw new Error(patErrorMsg(refR.status, refR.data));
   const parentSha = refR.data.object.sha;
 
   // 2. Get current commit's tree sha
-  const commitR = await ghFetch('/repos/' + REPO() + '/git/commits/' + parentSha);
+  const commitR = await ghFetch('/repos/' + repo + '/git/commits/' + parentSha);
   if (!commitR.ok) throw new Error(patErrorMsg(commitR.status, commitR.data));
   const baseTreeSha = commitR.data.tree.sha;
 
   // 3. Create blobs for each file (sequential to keep order + clearer errors)
   const treeEntries = [];
   for (const f of filesArr) {
-    const blobR = await ghFetch('/repos/' + REPO() + '/git/blobs', {
+    const blobR = await ghFetch('/repos/' + repo + '/git/blobs', {
       method: 'POST',
       body: JSON.stringify({
         content: b64encode(f.content),
@@ -703,14 +852,14 @@ async function publishMultiFile(filesArr, message) {
   }
 
   // 4. Create new tree
-  const treeR = await ghFetch('/repos/' + REPO() + '/git/trees', {
+  const treeR = await ghFetch('/repos/' + repo + '/git/trees', {
     method: 'POST',
     body: JSON.stringify({ base_tree: baseTreeSha, tree: treeEntries })
   });
   if (!treeR.ok) throw new Error(patErrorMsg(treeR.status, treeR.data));
 
   // 5. Create commit
-  const newCommitR = await ghFetch('/repos/' + REPO() + '/git/commits', {
+  const newCommitR = await ghFetch('/repos/' + repo + '/git/commits', {
     method: 'POST',
     body: JSON.stringify({
       message,
@@ -721,13 +870,41 @@ async function publishMultiFile(filesArr, message) {
   if (!newCommitR.ok) throw new Error(patErrorMsg(newCommitR.status, newCommitR.data));
 
   // 6. Update ref
-  const updR = await ghFetch('/repos/' + REPO() + '/git/refs/heads/main', {
+  const updR = await ghFetch('/repos/' + repo + '/git/refs/heads/' + encodeURIComponent(branch), {
     method: 'PATCH',
     body: JSON.stringify({ sha: newCommitR.data.sha })
   });
   if (!updR.ok) throw new Error(patErrorMsg(updR.status, updR.data));
 
-  return updR.data;
+  return {
+    commitUrl: 'https://github.com/' + repo + '/commit/' + newCommitR.data.sha,
+    commitSha: newCommitR.data.sha
+  };
+}
+
+/* Delete a file from the repo */
+async function deleteFile(path) {
+  const branch = BRANCH();
+  const repo = BROWSER_REPO();
+  const url = '/repos/' + repo + '/contents/' + encodeURIComponent(path).replace(/%2F/g, '/');
+  // Get current SHA
+  const r = await ghFetch(url + '?ref=' + encodeURIComponent(branch));
+  if (!r.ok) throw new Error(patErrorMsg(r.status, r.data));
+  const sha = r.data.sha;
+  // Delete
+  const delR = await ghFetch(url, {
+    method: 'DELETE',
+    body: JSON.stringify({
+      message: 'Delete ' + path,
+      sha,
+      branch
+    })
+  });
+  if (!delR.ok) throw new Error(patErrorMsg(delR.status, delR.data));
+  return {
+    commitUrl: delR.data?.commit?.html_url || null,
+    commitSha: delR.data?.commit?.sha || null
+  };
 }
 
 /* ============ UNLOCK / LOCK ============ */
@@ -962,16 +1139,48 @@ async function publish() {
     if (!confirm('الحجم الإجمالي ' + fmtSize(totalBytes) + '. يتجاوز ١ ميجا. الاستمرار؟')) return;
   }
 
+  // Multi-file: show confirm banner (non-blocking, replaces native confirm)
+  if (files.length >= 2) {
+    showPublishConfirm();
+    return;
+  }
+
+  // Single file: publish directly
+  await executePublish();
+}
+
+function showPublishConfirm() {
+  const banner = $('publishConfirmBanner');
+  const details = $('publishConfirmDetails');
+  const repo = REPO();
+  const branch = BRANCH();
+  const paths = files.map(f => f.path).join(', ');
+  details.innerHTML = 'سوف تنشر <strong>' + files.length + '</strong> ملفات في commit واحد:<br>'
+    + '<span style="font-family:var(--font-mono);font-size:11px;color:var(--ink-secondary);direction:ltr;display:inline-block;text-align:left;margin-top:4px">'
+    + escapeHtml(repo) + ' @ ' + escapeHtml(branch) + '<br>' + escapeHtml(paths)
+    + '</span>';
+  banner.classList.add('show');
+  // Scroll to banner
+  banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function hidePublishConfirm() {
+  $('publishConfirmBanner').classList.remove('show');
+}
+
+async function executePublish() {
+  hidePublishConfirm();
   $('publishBtn').disabled = true;
   const msg = smartCommitMessage();
+  let result = null;
 
   try {
     if (files.length === 1) {
       showStatus('loading', 'جاري النشر...');
-      await publishSingleFile(files[0], msg);
+      result = await publishSingleFile(files[0], msg);
     } else {
       showStatus('loading', 'نشر ' + files.length + ' ملفات في commit واحد...');
-      await publishMultiFile(files, msg);
+      result = await publishMultiFile(files, msg);
     }
 
     // Success
@@ -979,12 +1188,15 @@ async function publish() {
       ? 'تم نشر ' + files[0].path
       : 'تم نشر ' + files.length + ' ملفات بنجاح');
 
-    // Log
+    // Log with commit URL
     addLogEntry({
       paths: files.map(f => f.path),
       msg,
       date: Date.now(),
-      count: files.length
+      count: files.length,
+      commitUrl: result?.commitUrl || null,
+      commitSha: result?.commitSha || null,
+      repo: REPO()
     });
 
     // Recent
@@ -1019,7 +1231,7 @@ function renderLogs() {
   if (logs.length === 0) {
     list.innerHTML = '<div class="log-empty">لم تقم بأي نشر بعد</div>';
   } else {
-    list.innerHTML = logs.map(l => {
+    list.innerHTML = logs.map((l, idx) => {
       const isMulti = (l.count && l.count > 1) || (Array.isArray(l.paths) && l.paths.length > 1);
       const label = isMulti
         ? (l.count + ' ملفات: ' + l.paths.slice(0, 2).join(', ') + (l.paths.length > 2 ? '...' : ''))
@@ -1028,7 +1240,9 @@ function renderLogs() {
       const iconSvg = isMulti
         ? '<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>'
         : '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
-      return '<div class="log-item">'
+      const linkClass = l.commitUrl ? ' log-item-link' : '';
+      const dataAttr = l.commitUrl ? ' data-url="' + escapeHtml(l.commitUrl) + '"' : '';
+      return '<div class="log-item' + linkClass + '"' + dataAttr + '>'
         + '<div class="' + iconClass + '">' + iconSvg + '</div>'
         + '<div class="log-content">'
         + '<div class="log-filename">' + escapeHtml(label) + '</div>'
@@ -1037,6 +1251,13 @@ function renderLogs() {
         + '<span class="log-time">' + timeAgo(l.date) + '</span>'
         + '</div>';
     }).join('');
+    // Wire up click handlers for commit links
+    list.querySelectorAll('.log-item-link').forEach(item => {
+      item.addEventListener('click', () => {
+        const url = item.getAttribute('data-url');
+        if (url) window.open(url, '_blank');
+      });
+    });
   }
   $('logMeta').textContent = logs.length + ' commits';
 }
@@ -1158,11 +1379,118 @@ async function browse(path) {
         ? '<svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'
         : '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
       row.appendChild(iconBox);
-      row.appendChild(el('span', { class: 'browser-name' + (item.type === 'dir' ? ' dir' : '') }, item.name + (item.type === 'dir' ? '/' : '')));
+
+      // Name + size row
+      const nameRow = el('div', { class: 'browser-name-row' });
+      nameRow.appendChild(el('span', { class: 'browser-name' + (item.type === 'dir' ? ' dir' : '') },
+        item.name + (item.type === 'dir' ? '/' : '')));
+      // Show file size if available
+      if (item.type === 'file' && typeof item.size === 'number') {
+        nameRow.appendChild(el('span', { class: 'browser-file-size' }, fmtSize(item.size)));
+      }
+      row.appendChild(nameRow);
+
+      // Long press handler (for files only - context menu)
+      if (item.type === 'file') {
+        attachLongPress(row, item);
+      }
       list.appendChild(row);
     });
   } catch (e) {
     list.innerHTML = '<div class="browser-empty" style="color:var(--error)">' + escapeHtml(e.message) + '</div>';
+  }
+}
+
+/* Long-press detection for context menu */
+function attachLongPress(elem, item) {
+  let timer = null;
+  let startX = 0, startY = 0;
+  let moved = false;
+
+  const start = (e) => {
+    const touch = e.touches ? e.touches[0] : e;
+    startX = touch.clientX;
+    startY = touch.clientY;
+    moved = false;
+    timer = setTimeout(() => {
+      if (!moved) {
+        e.preventDefault?.();
+        showContextMenu(touch.clientX, touch.clientY, item);
+      }
+    }, 500);
+  };
+  const move = (e) => {
+    const touch = e.touches ? e.touches[0] : e;
+    if (Math.abs(touch.clientX - startX) > 8 || Math.abs(touch.clientY - startY) > 8) {
+      moved = true;
+      clearTimeout(timer);
+    }
+  };
+  const end = () => clearTimeout(timer);
+
+  elem.addEventListener('touchstart', start, { passive: true });
+  elem.addEventListener('touchmove', move, { passive: true });
+  elem.addEventListener('touchend', end);
+  elem.addEventListener('touchcancel', end);
+  // Desktop fallback
+  elem.addEventListener('mousedown', start);
+  elem.addEventListener('mousemove', move);
+  elem.addEventListener('mouseup', end);
+  elem.addEventListener('mouseleave', end);
+}
+
+let _ctxItem = null;
+function showContextMenu(x, y, item) {
+  _ctxItem = item;
+  const menu = $('ctxMenu');
+  menu.style.display = 'block';
+  // Position (constrain to viewport)
+  const w = menu.offsetWidth;
+  const h = menu.offsetHeight;
+  const maxX = window.innerWidth - w - 10;
+  const maxY = window.innerHeight - h - 10;
+  menu.style.left = Math.min(x, maxX) + 'px';
+  menu.style.top = Math.min(y, maxY) + 'px';
+  menu.classList.add('show');
+}
+
+function hideContextMenu() {
+  $('ctxMenu').classList.remove('show');
+  _ctxItem = null;
+}
+
+async function ctxLoad() {
+  const item = _ctxItem;
+  hideContextMenu();
+  if (!item) return;
+  syncEditorRepo();
+  await loadFileIntoNewRow(item.path);
+  showStatus('success', 'تم تحميل ' + item.path);
+}
+
+async function ctxDelete() {
+  const item = _ctxItem;
+  hideContextMenu();
+  if (!item) return;
+  if (!confirm('حذف ' + item.path + ' من ' + BROWSER_REPO() + '؟\n\nهذا الإجراء يحذف الملف من GitHub ولا يمكن التراجع عنه.')) return;
+  showStatus('loading', 'جاري حذف ' + item.path);
+  try {
+    const result = await deleteFile(item.path);
+    showStatus('success', 'تم حذف ' + item.path);
+    addLogEntry({
+      paths: [item.path],
+      msg: 'Delete ' + item.path,
+      date: Date.now(),
+      count: 1,
+      commitUrl: result?.commitUrl,
+      commitSha: result?.commitSha,
+      repo: BROWSER_REPO(),
+      deleted: true
+    });
+    // Refresh browser
+    browse(currentBrowsePath);
+  } catch (e) {
+    showStatus('error', e.message);
   }
 }
 
@@ -1180,18 +1508,18 @@ async function onBrowserItemClick(item) {
 /* Sync editor repo input with current browser repo */
 function syncEditorRepo() {
   const browserRepo = BROWSER_REPO();
-  const editorInput = $('repoInput');
-  if (editorInput) editorInput.value = browserRepo;
+  const editorSel = $('repoSelect');
+  if (!editorSel) return;
+  // Make sure the value exists as an option
+  ensureRepoInList(browserRepo);
+  editorSel.value = browserRepo;
+  saveLastRepos();
 }
 
-/* Debounced browser refresh on repo change */
-let _repoChangeTimer = null;
+/* Browser repo changed via select - refresh immediately */
 function onBrowserRepoChange() {
-  clearTimeout(_repoChangeTimer);
-  _repoChangeTimer = setTimeout(() => {
-    // Reset to root when repo changes
-    browse('');
-  }, 600);
+  saveLastRepos();
+  browse('');
 }
 
 function manualBrowserRefresh() {
@@ -1200,6 +1528,162 @@ function manualBrowserRefresh() {
   browse(currentBrowsePath).finally(() => {
     setTimeout(() => btn.classList.remove('loading'), 400);
   });
+}
+
+/* ============ REPO LIST MANAGEMENT ============ */
+function getRepoList() {
+  const list = readLS('gm_repos', null);
+  if (!list || !Array.isArray(list) || list.length === 0) {
+    // Seed with defaults
+    writeLS('gm_repos', SEED_REPOS.slice());
+    return SEED_REPOS.slice();
+  }
+  return list;
+}
+
+function saveRepoList(list) {
+  writeLS('gm_repos', list);
+}
+
+function ensureRepoInList(repo) {
+  if (!repo) return;
+  const list = getRepoList();
+  if (!list.includes(repo)) {
+    list.push(repo);
+    saveRepoList(list);
+    renderRepoSelects();
+  }
+}
+
+function addRepo(repo) {
+  repo = repo.trim();
+  if (!repo) return { ok: false, error: 'الاسم فارغ' };
+  if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo)) {
+    return { ok: false, error: 'الصيغة يجب أن تكون: owner/repo' };
+  }
+  const list = getRepoList();
+  if (list.includes(repo)) {
+    return { ok: false, error: 'المستودع موجود مسبقاً' };
+  }
+  list.push(repo);
+  saveRepoList(list);
+  renderRepoSelects();
+  return { ok: true };
+}
+
+function removeRepo(repo) {
+  const list = getRepoList().filter(r => r !== repo);
+  if (list.length === 0) {
+    // Don't allow empty list
+    return { ok: false, error: 'لازم يبقى مستودع واحد على الأقل' };
+  }
+  saveRepoList(list);
+  renderRepoSelects();
+  renderRepoManageList();
+  return { ok: true };
+}
+
+function renderRepoSelects() {
+  const list = getRepoList();
+  const lastBrowser = readLS('gm_repo_browser', null) || list[0];
+  const lastEditor = readLS('gm_repo_editor', null) || list[0];
+
+  ['browserRepoSelect', 'repoSelect'].forEach(id => {
+    const sel = $(id);
+    if (!sel) return;
+    const currentValue = sel.value;
+    sel.innerHTML = '';
+    list.forEach(repo => {
+      const opt = document.createElement('option');
+      opt.value = repo;
+      opt.textContent = repo;
+      sel.appendChild(opt);
+    });
+    // Restore selection
+    if (currentValue && list.includes(currentValue)) {
+      sel.value = currentValue;
+    } else if (id === 'browserRepoSelect' && list.includes(lastBrowser)) {
+      sel.value = lastBrowser;
+    } else if (id === 'repoSelect' && list.includes(lastEditor)) {
+      sel.value = lastEditor;
+    } else {
+      sel.value = list[0];
+    }
+  });
+}
+
+function saveLastRepos() {
+  writeLS('gm_repo_browser', BROWSER_REPO());
+  writeLS('gm_repo_editor', REPO());
+}
+
+function renderRepoManageList() {
+  const list = getRepoList();
+  const el = $('manageRepoList');
+  if (list.length === 0) {
+    el.innerHTML = '<div class="repo-list-empty">لا توجد مستودعات</div>';
+    return;
+  }
+  el.innerHTML = '';
+  list.forEach(repo => {
+    const row = document.createElement('div');
+    row.className = 'repo-list-item';
+    row.innerHTML = '<span class="repo-list-name">' + escapeHtml(repo) + '</span>'
+      + '<button type="button" class="repo-list-delete" data-repo="' + escapeHtml(repo) + '" title="حذف">'
+      + '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>'
+      + '</button>';
+    el.appendChild(row);
+  });
+  // Wire up delete buttons
+  el.querySelectorAll('.repo-list-delete').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const repo = btn.getAttribute('data-repo');
+      if (!confirm('حذف ' + repo + ' من القائمة؟ (لا يحذف من GitHub)')) return;
+      const r = removeRepo(repo);
+      if (!r.ok) showStatus('error', r.error);
+    });
+  });
+}
+
+function showAddRepo() {
+  hideManageRepo();
+  $('newRepoInput').value = '';
+  $('addRepoBanner').classList.add('show');
+  setTimeout(() => $('newRepoInput').focus(), 100);
+}
+
+function hideAddRepo() {
+  $('addRepoBanner').classList.remove('show');
+}
+
+function showManageRepo() {
+  hideAddRepo();
+  renderRepoManageList();
+  $('manageRepoBanner').classList.add('show');
+}
+
+function hideManageRepo() {
+  $('manageRepoBanner').classList.remove('show');
+}
+
+function handleAddRepoSave() {
+  const val = $('newRepoInput').value.trim();
+  const r = addRepo(val);
+  if (r.ok) {
+    // Select the new repo in the active context
+    if (mode === 'edit') {
+      $('browserRepoSelect').value = val;
+      saveLastRepos();
+      browse('');
+    } else {
+      $('repoSelect').value = val;
+      saveLastRepos();
+    }
+    hideAddRepo();
+    showStatus('success', 'تمت إضافة ' + val);
+  } else {
+    showStatus('error', r.error);
+  }
 }
 
 /* ============ MODE / TABS ============ */
@@ -1345,23 +1829,67 @@ async function refreshApp() {
 
 /* ============ INIT ============ */
 function init() {
-  // Listeners
+  // Display version
+  const vBadge = $('versionBadge');
+  if (vBadge) vBadge.textContent = VERSION;
+
+  // Render repo selects from saved list
+  renderRepoSelects();
+
+  // Listeners - lock
   $('lockForm').addEventListener('submit', unlock);
   $('patInput').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(e); });
   $('logoutBtn').addEventListener('click', logout);
+
+  // Topbar
   $('refreshBtn').addEventListener('click', refreshApp);
   $('renderBtn').addEventListener('click', () => window.open('https://dashboard.render.com', '_blank'));
+
+  // Publish + file actions
   $('publishBtn').addEventListener('click', publish);
   $('addFileBtn').addEventListener('click', () => addFileRow());
   $('attachFileBtn').addEventListener('click', () => $('fileInput').click());
   $('fileInput').addEventListener('change', handleAttach);
+
+  // Tabs
   $('tabNew').addEventListener('click', () => setMode('new'));
   $('tabEdit').addEventListener('click', () => setMode('edit'));
-  $('browserRepoInput').addEventListener('input', onBrowserRepoChange);
+
+  // Browser select + buttons
+  $('browserRepoSelect').addEventListener('change', onBrowserRepoChange);
   $('browserRefreshBtn').addEventListener('click', manualBrowserRefresh);
+  $('repoSelect').addEventListener('change', saveLastRepos);
+
+  // Repo management buttons (both pairs trigger same banners)
+  $('addRepoBtn1').addEventListener('click', showAddRepo);
+  $('addRepoBtn2').addEventListener('click', showAddRepo);
+  $('manageRepoBtn1').addEventListener('click', showManageRepo);
+  $('manageRepoBtn2').addEventListener('click', showManageRepo);
+  $('addRepoClose').addEventListener('click', hideAddRepo);
+  $('addRepoCancel').addEventListener('click', hideAddRepo);
+  $('addRepoSave').addEventListener('click', handleAddRepoSave);
+  $('newRepoInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleAddRepoSave(); });
+  $('manageRepoClose').addEventListener('click', hideManageRepo);
+
+  // Publish confirm
+  $('publishConfirmYes').addEventListener('click', executePublish);
+  $('publishConfirmCancel').addEventListener('click', hidePublishConfirm);
+
+  // Recent + draft
   $('recentClearBtn').addEventListener('click', clearRecent);
   $('draftRestoreBtn').addEventListener('click', restoreDraft);
   $('draftDismissBtn').addEventListener('click', dismissDraft);
+
+  // Context menu
+  $('ctxLoadBtn').addEventListener('click', ctxLoad);
+  $('ctxDeleteBtn').addEventListener('click', ctxDelete);
+  // Close context menu on outside click
+  document.addEventListener('click', (e) => {
+    const menu = $('ctxMenu');
+    if (menu.classList.contains('show') && !menu.contains(e.target)) {
+      hideContextMenu();
+    }
+  });
 
   // Initial state
   if (files.length === 0) addFileRow();

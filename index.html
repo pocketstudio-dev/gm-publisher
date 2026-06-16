@@ -185,6 +185,21 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 .draft-indicator.show{transform:translateX(-50%) translateY(-12px)}
 .draft-indicator svg{width:11px;height:11px;stroke:var(--success);stroke-width:2;fill:none;display:inline-block;vertical-align:-2px;margin-left:6px}
 
+/* ============ DRAFT PROMPT BANNER ============ */
+.draft-prompt{margin:0 16px 12px;padding:6px;background:var(--surface-outer);border:1px solid rgba(196,165,114,0.25);border-radius:18px;display:none}
+.draft-prompt.show{display:block;animation:slideDown 300ms var(--ease)}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.draft-prompt-inner{background:var(--accent-soft);border:1px solid rgba(196,165,114,0.15);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.draft-prompt-icon{width:32px;height:32px;border-radius:10px;background:var(--accent-soft);border:1px solid rgba(196,165,114,0.25);display:flex;align-items:center;justify-content:center;color:var(--accent);flex-shrink:0}
+.draft-prompt-icon svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+.draft-prompt-text{flex:1;min-width:140px;font-size:12px;color:var(--ink-primary);line-height:1.5}
+.draft-prompt-text strong{color:var(--accent);font-weight:600}
+.draft-prompt-actions{display:flex;gap:8px;flex-shrink:0}
+.draft-btn{padding:8px 14px;background:none;border:1px solid var(--hairline);border-radius:999px;font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer;color:var(--ink-secondary);transition:all 200ms var(--ease)}
+.draft-btn:active{transform:scale(0.95)}
+.draft-btn.primary{background:linear-gradient(180deg,#D4B57A,#B89456);color:#1A1308;border-color:transparent;font-weight:600}
+.draft-btn:hover{color:var(--ink-primary);border-color:var(--accent)}
+
 /* ============ LOG ============ */
 .log{margin:32px 16px 48px}
 .log-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;padding:0 8px}
@@ -260,6 +275,13 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
       </div>
     </div>
     <div class="topbar-actions">
+      <button class="icon-btn" id="refreshBtn" title="تحديث الأداة">
+        <svg viewBox="0 0 24 24">
+          <polyline points="23 4 23 10 17 10"/>
+          <polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      </button>
       <button class="icon-btn" id="renderBtn" title="افتح Render Dashboard">
         <svg viewBox="0 0 24 24">
           <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
@@ -279,6 +301,22 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
     <h1 class="hero-title">انشر الكود إلى <em>pocket-studio</em></h1>
     <p class="hero-sub">ملف واحد أو عدة ملفات في commit واحد. تعديل، إرفاق، تصفح.</p>
   </header>
+
+  <!-- DRAFT RESTORE BANNER (shows only after PAT auth) -->
+  <section class="draft-prompt" id="draftPrompt">
+    <div class="draft-prompt-inner">
+      <div class="draft-prompt-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <div class="draft-prompt-text">
+        مسودة محفوظة من <strong id="draftAge">قبل قليل</strong> (<span id="draftCount">١</span> ملف)
+      </div>
+      <div class="draft-prompt-actions">
+        <button class="draft-btn" id="draftDismissBtn">تجاهل</button>
+        <button class="draft-btn primary" id="draftRestoreBtn">استرجاع</button>
+      </div>
+    </div>
+  </section>
 
   <!-- RECENT FILES -->
   <section class="recent" id="recentSection">
@@ -1055,8 +1093,9 @@ async function onBrowserItemClick(item) {
   if (item.type === 'dir') {
     browse(item.path);
   } else {
+    // Load file but STAY in browser tab so user can navigate to other files
     await loadFileIntoNewRow(item.path);
-    setMode('new'); // Switch back to editor view to show loaded content
+    showStatus('success', 'تم تحميل ' + item.path + ' • انتقل لتاب "ملف جديد" للتحرير');
   }
 }
 
@@ -1133,14 +1172,34 @@ function maybeRestoreDraft() {
   }
   // Don't prompt if all files are empty
   if (!draft.files.some(f => f.content && f.content.length > 0)) return;
+
+  // SECURITY: only show draft banner AFTER successful PAT auth
+  if (!PAT || !username) return;
+
+  // Show non-blocking banner inside the app (not native confirm)
   const ageMins = Math.round(age / 60000);
-  const ageStr = ageMins < 60 ? (ageMins + ' دقيقة') : (Math.round(ageMins / 60) + ' ساعة');
-  if (confirm('عندك مسودة محفوظة من قبل ' + ageStr + ' (' + draft.files.length + ' ملف). استرجاعها؟')) {
-    files = draft.files;
-    renderFileRows();
-  } else {
-    clearDraft();
-  }
+  const ageStr = ageMins < 1 ? 'لحظات' :
+                 ageMins < 60 ? (ageMins + ' دقيقة') :
+                 (Math.round(ageMins / 60) + ' ساعة');
+  $('draftAge').textContent = ageStr;
+  $('draftCount').textContent = draft.files.length;
+  $('draftPrompt').classList.add('show');
+  window._pendingDraft = draft;
+}
+
+function restoreDraft() {
+  if (!window._pendingDraft) return;
+  files = window._pendingDraft.files;
+  renderFileRows();
+  $('draftPrompt').classList.remove('show');
+  delete window._pendingDraft;
+  showStatus('success', 'تم استرجاع المسودة');
+}
+
+function dismissDraft() {
+  clearDraft();
+  $('draftPrompt').classList.remove('show');
+  delete window._pendingDraft;
 }
 
 function flashDraftIndicator() {
@@ -1155,12 +1214,21 @@ function startDraftTimer() {
   draftTimer = setInterval(saveDraft, DRAFT_SAVE_INTERVAL);
 }
 
+/* ============ REFRESH ============ */
+function refreshApp() {
+  // Save current draft before reload
+  saveDraft();
+  // Hard reload to bypass cache
+  location.reload();
+}
+
 /* ============ INIT ============ */
 function init() {
   // Listeners
   $('lockForm').addEventListener('submit', unlock);
   $('patInput').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(e); });
   $('logoutBtn').addEventListener('click', logout);
+  $('refreshBtn').addEventListener('click', refreshApp);
   $('renderBtn').addEventListener('click', () => window.open('https://dashboard.render.com', '_blank'));
   $('publishBtn').addEventListener('click', publish);
   $('addFileBtn').addEventListener('click', () => addFileRow());
@@ -1170,6 +1238,8 @@ function init() {
   $('tabEdit').addEventListener('click', () => setMode('edit'));
   $('browserBack').addEventListener('click', browserBack);
   $('recentClearBtn').addEventListener('click', clearRecent);
+  $('draftRestoreBtn').addEventListener('click', restoreDraft);
+  $('draftDismissBtn').addEventListener('click', dismissDraft);
 
   // Initial state
   if (files.length === 0) addFileRow();
@@ -1188,4 +1258,3 @@ init();
 </script>
 </body>
 </html>
-

@@ -21,6 +21,11 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
 /* iOS: prevent auto-zoom when focusing inputs (requires min font-size 16px) */
 input,textarea,select{font-size:16px!important}
 
+/* Fix RTL leakage: isolate each input from surrounding bidi context.
+   This prevents Arabic labels/text outside from "bleeding" into LTR inputs. */
+input,textarea{unicode-bidi:isolate}
+input[dir="ltr"],textarea[dir="ltr"]{direction:ltr;text-align:left}
+
 :root{
   --bg-base:#050505;--bg-elevated:#0A0A0C;
   --surface-outer:#0F0F12;--surface-inner:#15151A;--surface-input:#1A1A20;
@@ -615,7 +620,7 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 'use strict';
 
 /* ============ CONSTANTS ============ */
-const VERSION = 'v0.2.10';
+const VERSION = 'v0.2.11';
 const DEFAULT_REPO = 'pocketstudio-dev/pocket-studio';
 const SEED_REPOS = ['pocketstudio-dev/pocket-studio', 'pocketstudio-dev/gm-publisher'];
 

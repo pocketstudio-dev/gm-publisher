@@ -6,16 +6,34 @@
 <meta name="theme-color" content="#050505">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>GrabMultid Publisher</title>
+<title>GrabMultid Publisher v2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--bg-base:#050505;--bg-elevated:#0A0A0C;--surface-outer:#0F0F12;--surface-inner:#15151A;--surface-input:#1A1A20;--hairline:rgba(255,255,255,0.06);--highlight:rgba(255,255,255,0.04);--ink-primary:#F7F4EE;--ink-secondary:rgba(247,244,238,0.6);--ink-tertiary:rgba(247,244,238,0.35);--ink-quaternary:rgba(247,244,238,0.18);--accent:#C4A572;--accent-soft:rgba(196,165,114,0.08);--success:#6EE7B7;--success-soft:rgba(110,231,183,0.12);--error:#FCA5A5;--error-soft:rgba(252,165,165,0.12);--font-display:'Newsreader','New York',Georgia,serif;--font-body:'IBM Plex Sans Arabic',-apple-system,system-ui,sans-serif;--font-mono:'SF Mono','JetBrains Mono',ui-monospace,monospace;--ease:cubic-bezier(0.16,1,0.3,1)}
+:root{
+  --bg-base:#050505;--bg-elevated:#0A0A0C;
+  --surface-outer:#0F0F12;--surface-inner:#15151A;--surface-input:#1A1A20;
+  --hairline:rgba(255,255,255,0.06);--highlight:rgba(255,255,255,0.04);
+  --ink-primary:#F7F4EE;--ink-secondary:rgba(247,244,238,0.6);
+  --ink-tertiary:rgba(247,244,238,0.35);--ink-quaternary:rgba(247,244,238,0.18);
+  --accent:#C4A572;--accent-soft:rgba(196,165,114,0.08);
+  --success:#6EE7B7;--success-soft:rgba(110,231,183,0.12);
+  --error:#FCA5A5;--error-soft:rgba(252,165,165,0.12);
+  --warn:#FCD34D;--warn-soft:rgba(252,211,77,0.12);
+  --font-display:'Newsreader','New York',Georgia,serif;
+  --font-body:'IBM Plex Sans Arabic',-apple-system,system-ui,sans-serif;
+  --font-mono:'SF Mono','JetBrains Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(0.16,1,0.3,1)
+}
 html{background:var(--bg-base);-webkit-text-size-adjust:100%}
 body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1.5;color:var(--ink-primary);background:var(--bg-base);overflow-x:hidden;background-image:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(196,165,114,0.06),transparent 50%),radial-gradient(ellipse 60% 40% at 10% 50%,rgba(196,165,114,0.04),transparent 50%);background-attachment:fixed}
 .app{max-width:780px;margin:0 auto;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);min-height:100dvh}
+
+/* ============ LOCK SCREEN ============ */
 .lock-screen{position:fixed;inset:0;background:var(--bg-base);z-index:100;display:flex;align-items:center;justify-content:center;padding:24px}
 .lock-screen.hidden{display:none}
 .lock-box{width:100%;max-width:400px;padding:6px;background:var(--surface-outer);border:1px solid var(--hairline);border-radius:24px;box-shadow:inset 0 1px 1px var(--highlight)}
@@ -24,7 +42,7 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 .lock-mark::after{content:'';position:absolute;inset:11px;border:2px solid rgba(10,10,12,0.7);border-radius:5px;border-top-color:transparent;border-left-color:transparent;transform:rotate(-45deg)}
 .lock-title{font-family:var(--font-display);font-size:22px;font-weight:500;margin-bottom:8px;letter-spacing:-0.01em}
 .lock-sub{font-size:13px;color:var(--ink-secondary);margin-bottom:24px;line-height:1.6}
-.lock-input{width:100%;padding:14px;background:var(--surface-input);border:1px solid var(--hairline);border-radius:10px;font-family:var(--font-mono);font-size:14px;color:var(--ink-primary);direction:ltr;text-align:left;margin-bottom:12px}
+.lock-input{width:100%;padding:14px;background:var(--surface-input);border:1px solid var(--hairline);border-radius:10px;font-family:var(--font-mono);font-size:14px;color:var(--ink-primary);margin-bottom:12px}
 .lock-input:focus{outline:none;border-color:rgba(196,165,114,0.3);box-shadow:0 0 0 3px var(--accent-soft)}
 .lock-btn{width:100%;padding:14px;background:linear-gradient(180deg,#D4B57A,#B89456);color:#1A1308;border:none;border-radius:999px;font-family:var(--font-body);font-weight:600;font-size:14px;cursor:pointer;box-shadow:inset 0 1px 1px rgba(255,255,255,0.3),0 8px 24px -8px rgba(196,165,114,0.4)}
 .lock-btn:active{transform:scale(0.97)}
@@ -33,145 +51,1094 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 .lock-help a{color:var(--accent);text-decoration:none;direction:ltr;display:inline-block;word-break:break-all}
 .lock-error{margin-top:12px;padding:10px;background:var(--error-soft);border:1px solid rgba(252,165,165,0.2);border-radius:10px;color:var(--error);font-size:12px;display:none}
 .lock-error.show{display:block}
-.topbar{position:sticky;top:env(safe-area-inset-top);z-index:10;padding:14px 20px;margin:12px 16px 0;background:rgba(10,10,12,0.7);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--hairline);border-radius:24px;display:flex;align-items:center;justify-content:space-between}
-.brand{display:flex;align-items:center;gap:10px}
+.keychain-hint{margin-top:12px;font-size:11px;color:var(--ink-tertiary);text-align:center}
+.keychain-hint span{color:var(--accent)}
+
+/* ============ TOPBAR ============ */
+.topbar{position:sticky;top:env(safe-area-inset-top);z-index:10;padding:14px 20px;margin:12px 16px 0;background:rgba(10,10,12,0.7);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--hairline);border-radius:24px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
 .brand-mark{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#D4B57A,#B89456);position:relative;flex-shrink:0;box-shadow:inset 0 1px 1px rgba(255,255,255,0.25),inset 0 -1px 1px rgba(0,0,0,0.2),0 4px 12px rgba(196,165,114,0.15)}
 .brand-mark::after{content:'';position:absolute;inset:6px;border:1.5px solid rgba(10,10,12,0.7);border-radius:3px;border-top-color:transparent;border-left-color:transparent;transform:rotate(-45deg)}
 .brand-name{font-weight:600;font-size:15px;letter-spacing:-0.01em}
 .brand-sub{font-family:var(--font-mono);font-size:11px;color:var(--ink-tertiary);margin-right:6px;letter-spacing:0.04em;direction:ltr}
+.topbar-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.icon-btn{width:34px;height:34px;border-radius:10px;background:var(--surface-input);border:1px solid var(--hairline);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-secondary);transition:all 200ms var(--ease);padding:0}
+.icon-btn:active{transform:scale(0.92)}
+.icon-btn:hover{color:var(--ink-primary);border-color:rgba(196,165,114,0.3)}
+.icon-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;fill:none}
 .topbar-status{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--success-soft);border:1px solid rgba(110,231,183,0.15);border-radius:999px;cursor:pointer}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);animation:pulse 2s var(--ease) infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.85)}}
-.status-text{font-size:11px;font-weight:500;color:var(--success);letter-spacing:0.02em;direction:ltr}
-.hero{padding:32px 24px 24px;text-align:right}
+.status-text{font-size:11px;font-weight:500;color:var(--success);letter-spacing:0.02em;direction:ltr;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ============ HERO ============ */
+.hero{padding:32px 24px 20px;text-align:right}
 .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:var(--accent-soft);border:1px solid rgba(196,165,114,0.15);border-radius:999px;font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:20px;direction:ltr}
 .eyebrow-dot{width:4px;height:4px;background:var(--accent);border-radius:50%}
 .hero-title{font-family:var(--font-display);font-weight:500;font-size:clamp(26px,7vw,38px);line-height:1.15;letter-spacing:-0.025em;text-wrap:balance;margin-bottom:12px}
 .hero-title em{font-style:italic;color:var(--accent)}
 .hero-sub{font-size:13px;line-height:1.6;color:var(--ink-secondary);max-width:34ch}
+
+/* ============ RECENT FILES ============ */
+.recent{margin:0 16px 16px;display:none}
+.recent.show{display:block}
+.recent-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 4px}
+.recent-label{font-size:11px;font-weight:500;color:var(--ink-secondary);letter-spacing:0.04em;text-transform:uppercase}
+.recent-clear{font-size:11px;color:var(--ink-tertiary);background:none;border:none;cursor:pointer;padding:4px}
+.recent-chips{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px;scrollbar-width:none}
+.recent-chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--surface-outer);border:1px solid var(--hairline);border-radius:999px;font-family:var(--font-mono);font-size:12px;color:var(--ink-secondary);cursor:pointer;direction:ltr;transition:all 200ms var(--ease)}
+.chip:hover{color:var(--ink-primary);border-color:rgba(196,165,114,0.3)}
+.chip:active{transform:scale(0.95)}
+.chip svg{width:11px;height:11px;stroke:var(--accent);stroke-width:2;fill:none;flex-shrink:0}
+
+/* ============ TABS ============ */
+.tabs{display:flex;gap:4px;margin:0 16px 12px;padding:4px;background:var(--surface-outer);border:1px solid var(--hairline);border-radius:14px}
+.tab{flex:1;padding:10px 14px;background:none;border:none;border-radius:10px;font-family:var(--font-body);font-size:13px;font-weight:500;color:var(--ink-tertiary);cursor:pointer;transition:all 200ms var(--ease)}
+.tab.active{background:var(--surface-inner);color:var(--ink-primary);box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.tab:active{transform:scale(0.98)}
+
+/* ============ FILE BROWSER ============ */
+.browser{margin:0 16px 12px;padding:6px;background:var(--surface-outer);border:1px solid var(--hairline);border-radius:18px;display:none}
+.browser.show{display:block}
+.browser-inner{background:var(--surface-inner);border:1px solid var(--hairline);border-radius:14px;overflow:hidden}
+.browser-path{padding:12px 16px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:12px;color:var(--ink-secondary);direction:ltr}
+.browser-path-back{background:none;border:none;color:var(--accent);cursor:pointer;padding:2px 6px;font-size:14px}
+.browser-path-back:disabled{color:var(--ink-quaternary);cursor:not-allowed}
+.browser-list{max-height:240px;overflow-y:auto}
+.browser-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--hairline);cursor:pointer;transition:background 150ms var(--ease)}
+.browser-item:last-child{border-bottom:none}
+.browser-item:hover{background:var(--highlight)}
+.browser-item:active{background:var(--accent-soft)}
+.browser-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--surface-input)}
+.browser-icon svg{width:12px;height:12px;stroke:var(--accent);stroke-width:2;fill:none}
+.browser-icon.dir svg{stroke:var(--ink-secondary)}
+.browser-name{flex:1;font-family:var(--font-mono);font-size:13px;direction:ltr;text-align:left;color:var(--ink-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.browser-name.dir{color:var(--ink-secondary)}
+.browser-empty{padding:24px;text-align:center;color:var(--ink-tertiary);font-size:13px}
+.browser-loading{padding:24px;text-align:center;color:var(--ink-tertiary);font-size:13px;display:flex;align-items:center;justify-content:center;gap:10px}
+
+/* ============ EDITOR SHELL ============ */
 .shell{margin:0 16px;padding:6px;background:var(--surface-outer);border:1px solid var(--hairline);border-radius:24px;box-shadow:inset 0 1px 1px var(--highlight),0 24px 64px -32px rgba(0,0,0,0.8)}
 .core{background:var(--surface-inner);border:1px solid var(--hairline);border-radius:18px;overflow:hidden}
-.field{padding:20px;border-bottom:1px solid var(--hairline)}
-.field:last-of-type{border-bottom:none}
-.field-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.field-label-text{font-size:11px;font-weight:500;color:var(--ink-secondary);letter-spacing:0.04em;text-transform:uppercase}
-.field-label-meta{font-family:var(--font-mono);font-size:10px;color:var(--ink-quaternary);direction:ltr}
-.input{width:100%;padding:12px 14px;background:var(--surface-input);border:1px solid var(--hairline);border-radius:10px;font-family:var(--font-mono);font-size:14px;color:var(--ink-primary);direction:ltr;text-align:left;transition:border-color 200ms var(--ease)}
+
+.repo-row{padding:14px 20px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.repo-row-label{font-size:11px;font-weight:500;color:var(--ink-secondary);letter-spacing:0.04em;text-transform:uppercase}
+.repo-row-value{font-family:var(--font-mono);font-size:12px;color:var(--ink-primary);direction:ltr}
+
+.file-row{padding:16px 20px;border-bottom:1px solid var(--hairline);position:relative}
+.file-row-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
+.file-row-num{font-family:var(--font-mono);font-size:10px;color:var(--ink-quaternary);background:var(--surface-input);padding:3px 8px;border-radius:6px;direction:ltr;letter-spacing:0.04em;flex-shrink:0}
+.file-row-actions{display:flex;gap:6px;align-items:center}
+.file-row-meta{font-family:var(--font-mono);font-size:10px;color:var(--ink-quaternary);direction:ltr}
+.file-row-remove{background:none;border:none;color:var(--ink-tertiary);cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center;border-radius:6px}
+.file-row-remove:hover{color:var(--error);background:var(--error-soft)}
+.file-row-remove svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+.file-row-remove:disabled{opacity:0.3;cursor:not-allowed}
+
+.label-text{display:block;font-size:11px;font-weight:500;color:var(--ink-secondary);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px}
+.input{width:100%;padding:12px 14px;background:var(--surface-input);border:1px solid var(--hairline);border-radius:10px;font-family:var(--font-mono);font-size:14px;color:var(--ink-primary);transition:border-color 200ms var(--ease)}
 .input:focus{outline:none;border-color:rgba(196,165,114,0.3);box-shadow:0 0 0 3px var(--accent-soft)}
-.code-area{width:100%;min-height:200px;padding:14px;background:var(--surface-input);border:1px solid var(--hairline);border-radius:12px;font-family:var(--font-mono);font-size:13px;line-height:1.6;color:var(--ink-primary);direction:ltr;text-align:left;resize:vertical}
+.code-area{width:100%;min-height:180px;padding:14px;background:var(--surface-input);border:1px solid var(--hairline);border-radius:12px;font-family:var(--font-mono);font-size:13px;line-height:1.6;color:var(--ink-primary);resize:vertical;margin-top:10px}
 .code-area:focus{outline:none;border-color:rgba(196,165,114,0.3);box-shadow:0 0 0 3px var(--accent-soft)}
+
+/* Preview pane with syntax highlighting */
+.preview-wrap{margin-top:10px;background:var(--surface-input);border:1px solid var(--hairline);border-radius:12px;overflow:hidden;display:none}
+.preview-wrap.show{display:block}
+.preview-header{padding:8px 14px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.preview-lang{font-family:var(--font-mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em}
+.preview-toggle{background:none;border:none;color:var(--ink-tertiary);font-size:11px;cursor:pointer;padding:4px 8px}
+.preview-toggle:hover{color:var(--accent)}
+.preview-pre{margin:0;padding:14px;max-height:300px;overflow:auto;font-family:var(--font-mono);font-size:12px;line-height:1.6;direction:ltr;text-align:left}
+.preview-pre code{background:none!important;padding:0!important}
+
+/* ============ ADD ACTIONS ============ */
+.add-actions{padding:14px 20px;border-bottom:1px solid var(--hairline);display:flex;gap:8px;flex-wrap:wrap}
+.add-btn{flex:1;min-width:140px;padding:10px 14px;background:var(--surface-input);border:1px dashed rgba(196,165,114,0.3);border-radius:10px;color:var(--accent);font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 200ms var(--ease)}
+.add-btn:hover{background:var(--accent-soft);border-color:var(--accent)}
+.add-btn:active{transform:scale(0.97)}
+.add-btn svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
+
+/* ============ COMMIT + PUBLISH ============ */
+.commit-row{padding:16px 20px;border-bottom:1px solid var(--hairline)}
 .actions{padding:20px;display:flex;gap:10px;align-items:center}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:14px 22px;font-family:var(--font-body);font-size:14px;font-weight:500;border:none;border-radius:999px;cursor:pointer;transition:all 350ms var(--ease)}
 .btn:active{transform:scale(0.97)}
 .btn:disabled{opacity:0.5;cursor:not-allowed}
 .btn-primary{flex:1;background:linear-gradient(180deg,#D4B57A 0%,#B89456 100%);color:#1A1308;box-shadow:inset 0 1px 1px rgba(255,255,255,0.3),inset 0 -1px 1px rgba(0,0,0,0.15),0 8px 24px -8px rgba(196,165,114,0.4),0 0 0 1px rgba(196,165,114,0.4);font-weight:600}
 .btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.5;fill:none}
+
+/* ============ STATUS BAR ============ */
 .status-bar{margin:24px 16px 0;padding:14px 18px;border-radius:14px;font-size:13px;display:none;align-items:center;gap:10px}
 .status-bar.show{display:flex}
 .status-bar.loading{background:var(--accent-soft);border:1px solid rgba(196,165,114,0.2);color:var(--accent)}
 .status-bar.success{background:var(--success-soft);border:1px solid rgba(110,231,183,0.2);color:var(--success)}
 .status-bar.error{background:var(--error-soft);border:1px solid rgba(252,165,165,0.2);color:var(--error)}
+.status-bar.warn{background:var(--warn-soft);border:1px solid rgba(252,211,77,0.2);color:var(--warn)}
 .spinner{width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ============ DRAFT INDICATOR ============ */
+.draft-indicator{position:fixed;bottom:env(safe-area-inset-bottom,0px);left:50%;transform:translateX(-50%) translateY(120%);padding:8px 16px;background:var(--surface-outer);border:1px solid var(--hairline);border-radius:999px;font-size:11px;color:var(--ink-secondary);box-shadow:0 8px 24px rgba(0,0,0,0.4);transition:transform 400ms var(--ease);z-index:20}
+.draft-indicator.show{transform:translateX(-50%) translateY(-12px)}
+.draft-indicator svg{width:11px;height:11px;stroke:var(--success);stroke-width:2;fill:none;display:inline-block;vertical-align:-2px;margin-left:6px}
+
+/* ============ LOG ============ */
 .log{margin:32px 16px 48px}
 .log-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;padding:0 8px}
 .log-title{font-family:var(--font-display);font-size:18px;font-weight:500;letter-spacing:-0.01em}
 .log-meta{font-family:var(--font-mono);font-size:11px;color:var(--ink-tertiary);direction:ltr}
-.log-list{background:var(--surface-outer);border:1px solid var(--hairline);border-radius:18px;overflow:hidden}
+.log-list{background:var(--surface-outer);border:1px solid var(--hairline);border-radius:18px;overflow:hidden;max-height:400px;overflow-y:auto}
 .log-empty{padding:32px 20px;text-align:center;color:var(--ink-tertiary);font-size:13px}
 .log-item{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--hairline)}
 .log-item:last-child{border-bottom:none}
 .log-icon{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--success-soft);color:var(--success)}
+.log-icon.multi{background:var(--accent-soft);color:var(--accent)}
 .log-icon svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
 .log-content{flex:1;min-width:0}
 .log-filename{font-family:var(--font-mono);font-size:13px;color:var(--ink-primary);direction:ltr;text-align:left;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .log-msg{font-size:12px;color:var(--ink-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .log-time{font-family:var(--font-mono);font-size:11px;color:var(--ink-quaternary);direction:ltr;flex-shrink:0}
+
+/* Hidden helper for Keychain */
+.kc-username{position:absolute;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none}
+
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
 </style>
 </head>
 <body>
+
+<!-- =========== LOCK SCREEN =========== -->
 <div class="lock-screen" id="lockScreen">
-<div class="lock-box"><div class="lock-inner">
-<div class="lock-mark"></div>
-<h1 class="lock-title">GrabMultid Publisher</h1>
-<p class="lock-sub">أدخل GitHub Personal Access Token<br>للوصول إلى مستودعاتك الخاصة</p>
-<input type="password" class="lock-input" id="patInput" placeholder="github_pat_..." autocomplete="off">
-<button class="lock-btn" id="unlockBtn">فتح الأداة</button>
-<div class="lock-error" id="lockError"></div>
-<div class="lock-help">
-<strong style="color:var(--ink-secondary)">كيف تحصل على PAT:</strong><br>
-١. <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">github.com/settings/personal-access-tokens/new</a><br>
-٢. Repository: pocket-studio<br>
-٣. Permissions: Contents (Read &amp; Write)<br>
-٤. Generate token وانسخه
+  <div class="lock-box">
+    <div class="lock-inner">
+      <div class="lock-mark"></div>
+      <h1 class="lock-title">GrabMultid Publisher</h1>
+      <p class="lock-sub">أدخل GitHub Personal Access Token<br>iOS سيحفظه في iCloud Keychain</p>
+
+      <form id="lockForm" action="#" autocomplete="on">
+        <input class="kc-username" type="text" name="username" id="kcUser"
+               autocomplete="username" value="pocketstudio-dev" readonly tabindex="-1">
+        <input type="password" class="lock-input" id="patInput"
+               name="password"
+               placeholder="github_pat_..."
+               autocomplete="current-password"
+               dir="ltr">
+        <button type="submit" class="lock-btn" id="unlockBtn">فتح الأداة</button>
+      </form>
+
+      <div class="lock-error" id="lockError"></div>
+
+      <div class="keychain-hint">
+        <span>🔐</span> أول مرة: iOS يسأل "حفظ كلمة المرور؟" — اضغط نعم.
+        <br>بعدها: Face ID + ضغطة وحدة.
+      </div>
+
+      <div class="lock-help">
+        <strong style="color:var(--ink-secondary)">كيف تحصل على PAT:</strong><br>
+        ١. <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">github.com/settings/personal-access-tokens/new</a><br>
+        ٢. Repository: pocket-studio<br>
+        ٣. Permissions: Contents (Read &amp; Write)<br>
+        ٤. Generate token وانسخه
+      </div>
+    </div>
+  </div>
 </div>
-</div></div>
-</div>
+
+<!-- =========== APP =========== -->
 <div class="app">
-<nav class="topbar">
-<div class="brand">
-<div class="brand-mark"></div>
-<div><span class="brand-name">GrabMultid</span><span class="brand-sub">/ publisher</span></div>
+
+  <!-- TOPBAR -->
+  <nav class="topbar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>
+        <span class="brand-name">GrabMultid</span>
+        <span class="brand-sub">/ publisher</span>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="renderBtn" title="افتح Render Dashboard">
+        <svg viewBox="0 0 24 24">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </svg>
+      </button>
+      <div class="topbar-status" id="logoutBtn" title="خروج">
+        <span class="dot"></span>
+        <span class="status-text" id="userBadge">connecting</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="eyebrow"><span class="eyebrow-dot"></span><span>v0.2 — MULTI-FILE PUBLISHER</span></div>
+    <h1 class="hero-title">انشر الكود إلى <em>pocket-studio</em></h1>
+    <p class="hero-sub">ملف واحد أو عدة ملفات في commit واحد. تعديل، إرفاق، تصفح.</p>
+  </header>
+
+  <!-- RECENT FILES -->
+  <section class="recent" id="recentSection">
+    <div class="recent-header">
+      <span class="recent-label">آخر الملفات</span>
+      <button class="recent-clear" id="recentClearBtn">مسح</button>
+    </div>
+    <div class="recent-chips" id="recentChips"></div>
+  </section>
+
+  <!-- MODE TABS -->
+  <div class="tabs">
+    <button class="tab active" data-mode="new" id="tabNew">ملف جديد</button>
+    <button class="tab" data-mode="edit" id="tabEdit">تصفح وتعديل</button>
+  </div>
+
+  <!-- FILE BROWSER (edit mode) -->
+  <section class="browser" id="browserSection">
+    <div class="browser-inner">
+      <div class="browser-path">
+        <button class="browser-path-back" id="browserBack" disabled>← رجوع</button>
+        <span id="browserPath">pocket-studio/</span>
+      </div>
+      <div class="browser-list" id="browserList">
+        <div class="browser-loading">
+          <span class="spinner"></span>
+          <span>جاري التحميل...</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDITOR SHELL -->
+  <section class="shell">
+    <div class="core">
+
+      <!-- REPO ROW -->
+      <div class="repo-row">
+        <span class="repo-row-label">المستودع</span>
+        <span class="repo-row-value">pocketstudio-dev/pocket-studio</span>
+      </div>
+
+      <!-- FILE ROWS (dynamic) -->
+      <div id="fileRows"></div>
+
+      <!-- ADD ACTIONS -->
+      <div class="add-actions">
+        <button class="add-btn" id="addFileBtn">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          <span>إضافة ملف</span>
+        </button>
+        <button class="add-btn" id="attachFileBtn">
+          <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          <span>إرفاق من الآيفون</span>
+        </button>
+        <input type="file" id="fileInput" hidden>
+      </div>
+
+      <!-- COMMIT MESSAGE -->
+      <div class="commit-row">
+        <label class="label-text" for="msgInput">رسالة الـ Commit</label>
+        <input type="text" class="input" id="msgInput"
+               placeholder="اتركها فاضية للرسالة التلقائية"
+               dir="ltr">
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="actions">
+        <button class="btn btn-primary" id="publishBtn">
+          <span id="publishBtnText">نشر إلى GitHub</span>
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar" id="statusBar"></div>
+
+  <!-- LOG -->
+  <aside class="log">
+    <div class="log-header">
+      <h2 class="log-title">آخر العمليات</h2>
+      <span class="log-meta" id="logMeta">0 commits</span>
+    </div>
+    <div class="log-list" id="logList">
+      <div class="log-empty">لم تقم بأي نشر بعد</div>
+    </div>
+  </aside>
+
 </div>
-<div class="topbar-status" id="logoutBtn" title="خروج">
-<span class="dot"></span><span class="status-text" id="userBadge">connecting</span>
+
+<!-- DRAFT INDICATOR -->
+<div class="draft-indicator" id="draftIndicator">
+  <span>تم حفظ المسودة</span>
+  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
 </div>
-</nav>
-<header class="hero">
-<div class="eyebrow"><span class="eyebrow-dot"></span><span>v0.1 — PRIVATE PUBLISHER</span></div>
-<h1 class="hero-title">انشر الكود إلى <em>pocket-studio</em></h1>
-<p class="hero-sub">الصق كود من Claude، اختر اسم ملف، اضغط نشر.</p>
-</header>
-<section class="shell"><div class="core">
-<div class="field">
-<div class="field-label"><span class="field-label-text">المستودع</span><span class="field-label-meta">owner/repo</span></div>
-<input type="text" class="input" id="repoInput" value="pocketstudio-dev/pocket-studio">
-</div>
-<div class="field">
-<div class="field-label"><span class="field-label-text">اسم الملف</span><span class="field-label-meta">path/to/file</span></div>
-<input type="text" class="input" id="pathInput" placeholder="bot/main.py">
-</div>
-<div class="field">
-<div class="field-label"><span class="field-label-text">رسالة الـ Commit</span></div>
-<input type="text" class="input" id="msgInput" placeholder="Add main.py">
-</div>
-<div class="field">
-<div class="field-label"><span class="field-label-text">المحتوى</span><span class="field-label-meta" id="contentMeta">0 lines</span></div>
-<textarea class="code-area" id="contentInput" placeholder="الصق الكود هنا..." spellcheck="false"></textarea>
-</div>
-<div class="actions">
-<button class="btn btn-primary" id="publishBtn">نشر إلى GitHub
-<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-</button>
-</div>
-</div></section>
-<div class="status-bar" id="statusBar"></div>
-<aside class="log">
-<div class="log-header"><h2 class="log-title">آخر العمليات</h2><span class="log-meta" id="logMeta">0 commits</span></div>
-<div class="log-list" id="logList"><div class="log-empty">لم تقم بأي نشر بعد</div></div>
-</aside>
-</div>
+
 <script>
-const lockScreen=document.getElementById('lockScreen'),patInput=document.getElementById('patInput'),unlockBtn=document.getElementById('unlockBtn'),lockError=document.getElementById('lockError'),userBadge=document.getElementById('userBadge'),logoutBtn=document.getElementById('logoutBtn'),repoInput=document.getElementById('repoInput'),pathInput=document.getElementById('pathInput'),msgInput=document.getElementById('msgInput'),contentInput=document.getElementById('contentInput'),contentMeta=document.getElementById('contentMeta'),publishBtn=document.getElementById('publishBtn'),statusBar=document.getElementById('statusBar'),logList=document.getElementById('logList'),logMeta=document.getElementById('logMeta');
-let PAT=sessionStorage.getItem('gm_pat')||'',username=sessionStorage.getItem('gm_user')||'',logs=JSON.parse(sessionStorage.getItem('gm_logs')||'[]');
-function showError(m){lockError.textContent=m;lockError.classList.add('show');setTimeout(()=>lockError.classList.remove('show'),5000)}
-function showStatus(t,m){statusBar.className='status-bar show '+t;statusBar.innerHTML=t==='loading'?'<span class="spinner"></span><span>'+m+'</span>':'<span>'+m+'</span>'}
-function hideStatus(d){setTimeout(()=>statusBar.classList.remove('show'),d||5000)}
-async function validatePAT(t){try{const r=await fetch('https://api.github.com/user',{headers:{'Authorization':'Bearer '+t,'Accept':'application/vnd.github+json'}});if(!r.ok)return null;const d=await r.json();return d.login}catch(e){return null}}
-async function unlock(){const t=patInput.value.trim();if(!t){showError('أدخل PAT أولا');return}unlockBtn.disabled=true;unlockBtn.textContent='جاري التحقق...';const u=await validatePAT(t);if(u){PAT=t;username=u;sessionStorage.setItem('gm_pat',t);sessionStorage.setItem('gm_user',u);userBadge.textContent=u;lockScreen.classList.add('hidden');patInput.value=''}else{showError('PAT غير صالح. تأكد من الصلاحيات.');unlockBtn.disabled=false;unlockBtn.textContent='فتح الأداة'}}
-function logout(){if(confirm('خروج وحذف PAT؟')){sessionStorage.removeItem('gm_pat');sessionStorage.removeItem('gm_user');PAT='';username='';location.reload()}}
-function timeAgo(d){const s=Math.floor((Date.now()-d)/1000);if(s<60)return s+'s';if(s<3600)return Math.floor(s/60)+'m';if(s<86400)return Math.floor(s/3600)+'h';return Math.floor(s/86400)+'d'}
-function renderLogs(){if(logs.length===0){logList.innerHTML='<div class="log-empty">لم تقم بأي نشر بعد</div>'}else{logList.innerHTML=logs.slice(0,10).map(l=>`<div class="log-item"><div class="log-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="log-content"><div class="log-filename">${l.path}</div><div class="log-msg">${l.msg}</div></div><span class="log-time">${timeAgo(l.date)}</span></div>`).join('')}logMeta.textContent=logs.length+' commits'}
-function b64encode(s){return btoa(unescape(encodeURIComponent(s)))}
-async function publish(){const repo=repoInput.value.trim(),path=pathInput.value.trim(),msg=msgInput.value.trim()||'Add '+path,content=contentInput.value;if(!repo.includes('/')){showStatus('error','صيغة المستودع: owner/repo');hideStatus();return}if(!path){showStatus('error','أدخل اسم الملف');hideStatus();return}if(!content){showStatus('error','المحتوى فارغ');hideStatus();return}publishBtn.disabled=true;showStatus('loading','جاري التحقق من الملف...');let sha=null;try{const r=await fetch(`https://api.github.com/repos/${repo}/contents/${path}`,{headers:{'Authorization':'Bearer '+PAT,'Accept':'application/vnd.github+json'}});if(r.ok){const d=await r.json();sha=d.sha}}catch(e){}showStatus('loading',sha?'جاري التحديث...':'جاري الإنشاء...');const body={message:msg,content:b64encode(content),branch:'main'};if(sha)body.sha=sha;try{const r=await fetch(`https://api.github.com/repos/${repo}/contents/${path}`,{method:'PUT',headers:{'Authorization':'Bearer '+PAT,'Accept':'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(r.ok){showStatus('success','تم نشر '+path+' بنجاح');logs.unshift({path,msg,date:Date.now()});sessionStorage.setItem('gm_logs',JSON.stringify(logs));renderLogs();pathInput.value='';msgInput.value='';contentInput.value='';contentMeta.textContent='0 lines'}else{showStatus('error',d.message||'فشل النشر')}}catch(e){showStatus('error','خطأ في الاتصال: '+e.message)}publishBtn.disabled=false;hideStatus()}
-contentInput.addEventListener('input',()=>{const l=contentInput.value.split('\n').length,b=new Blob([contentInput.value]).size;contentMeta.textContent=l+' lines · '+(b<1024?b+'B':(b/1024).toFixed(1)+'KB')});
-unlockBtn.addEventListener('click',unlock);
-patInput.addEventListener('keydown',e=>{if(e.key==='Enter')unlock()});
-publishBtn.addEventListener('click',publish);
-logoutBtn.addEventListener('click',logout);
-if(PAT&&username){userBadge.textContent=username;lockScreen.classList.add('hidden')}
-renderLogs();
+'use strict';
+
+/* ============ CONSTANTS ============ */
+const REPO = 'pocketstudio-dev/pocket-studio';
+const MAX_LOGS = 50;
+const MAX_RECENT = 5;
+const SOFT_SIZE_LIMIT = 1024 * 1024;
+const HARD_SIZE_LIMIT = 100 * 1024 * 1024;
+const DRAFT_TTL = 24 * 60 * 60 * 1000;
+const DRAFT_SAVE_INTERVAL = 5000;
+
+const LANG_MAP = {
+  py:'python', pyw:'python',
+  yml:'yaml', yaml:'yaml',
+  js:'javascript', mjs:'javascript', cjs:'javascript',
+  ts:'typescript', tsx:'typescript', jsx:'javascript',
+  html:'xml', htm:'xml', xml:'xml', svg:'xml',
+  css:'css', scss:'css',
+  sh:'bash', bash:'bash', zsh:'bash',
+  json:'json', jsonc:'json',
+  md:'markdown', markdown:'markdown',
+  toml:'toml', ini:'ini', cfg:'ini',
+  sql:'sql',
+  dockerfile:'dockerfile',
+  env:'bash',
+  gitignore:'plaintext',
+  txt:'plaintext'
+};
+
+/* ============ DOM HELPERS ============ */
+const $ = id => document.getElementById(id);
+const el = (tag, attrs = {}, children = []) => {
+  const e = document.createElement(tag);
+  for (const k in attrs) {
+    if (k === 'class') e.className = attrs[k];
+    else if (k === 'html') e.innerHTML = attrs[k];
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2).toLowerCase(), attrs[k]);
+    else e.setAttribute(k, attrs[k]);
+  }
+  for (const c of (Array.isArray(children) ? children : [children])) {
+    if (c == null) continue;
+    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  }
+  return e;
+};
+
+/* ============ STATE ============ */
+let PAT = sessionStorage.getItem('gm_pat') || '';
+let username = sessionStorage.getItem('gm_user') || '';
+let logs = readLS('gm_logs', []);
+let recent = readLS('gm_recent', []);
+let files = [];
+let mode = 'new';
+let currentBrowsePath = '';
+let draftTimer = null;
+let lastDraftHash = '';
+
+/* ============ STORAGE HELPERS ============ */
+function readLS(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) || fallback; }
+  catch { return fallback; }
+}
+function writeLS(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); }
+  catch (e) { console.warn('LS write failed:', e); }
+}
+
+/* ============ LANGUAGE DETECTION ============ */
+function detectLang(path) {
+  if (!path) return 'plaintext';
+  const name = path.split('/').pop().toLowerCase();
+  if (name === 'dockerfile') return 'dockerfile';
+  if (name === '.env' || name.endsWith('.env')) return 'bash';
+  if (name === '.gitignore' || name === '.gitattributes') return 'plaintext';
+  const ext = name.includes('.') ? name.split('.').pop() : '';
+  return LANG_MAP[ext] || 'plaintext';
+}
+
+/* ============ SIZE FORMATTER ============ */
+function fmtSize(bytes) {
+  if (bytes < 1024) return bytes + 'B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'KB';
+  return (bytes / 1024 / 1024).toFixed(2) + 'MB';
+}
+function timeAgo(d) {
+  const s = Math.floor((Date.now() - d) / 1000);
+  if (s < 60) return s + 's';
+  if (s < 3600) return Math.floor(s / 60) + 'm';
+  if (s < 86400) return Math.floor(s / 3600) + 'h';
+  return Math.floor(s / 86400) + 'd';
+}
+
+/* ============ B64 (UTF-8 safe) ============ */
+function b64encode(s) {
+  return btoa(unescape(encodeURIComponent(s)));
+}
+function b64decode(s) {
+  return decodeURIComponent(escape(atob(s.replace(/\s/g, ''))));
+}
+
+/* ============ STATUS BAR ============ */
+function showStatus(type, msg, autoHide) {
+  const bar = $('statusBar');
+  bar.className = 'status-bar show ' + type;
+  bar.innerHTML = (type === 'loading')
+    ? '<span class="spinner"></span><span>' + msg + '</span>'
+    : '<span>' + msg + '</span>';
+  if (autoHide !== false) {
+    setTimeout(() => bar.classList.remove('show'), type === 'loading' ? 30000 : 5000);
+  }
+}
+function hideStatus() {
+  $('statusBar').classList.remove('show');
+}
+
+/* ============ GITHUB API ============ */
+async function ghFetch(endpoint, options = {}) {
+  const headers = {
+    'Authorization': 'Bearer ' + PAT,
+    'Accept': 'application/vnd.github+json',
+    ...(options.headers || {})
+  };
+  if (options.body && !headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json';
+  }
+  const r = await fetch('https://api.github.com' + endpoint, { ...options, headers });
+  let data = null;
+  try { data = await r.json(); } catch {}
+  return { ok: r.ok, status: r.status, data };
+}
+
+function patErrorMsg(status, body) {
+  if (status === 401) return 'PAT منتهي أو غير صالح. أعد إنشاءه.';
+  if (status === 403) {
+    const m = body?.message || '';
+    if (m.includes('rate limit')) return 'تجاوزت حد طلبات GitHub. انتظر دقائق.';
+    return 'PAT بدون صلاحيات Contents (Read & Write).';
+  }
+  if (status === 404) return 'المستودع غير موجود أو PAT بدون وصول له.';
+  if (status === 422) return 'البيانات غير صحيحة: ' + (body?.message || '');
+  if (status === 409) return 'تعارض في التحديث. حدث الصفحة وحاول مجددا.';
+  return body?.message || ('خطأ غير متوقع (' + status + ')');
+}
+
+async function validatePAT(token) {
+  try {
+    const r = await fetch('https://api.github.com/user', {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+    });
+    if (!r.ok) return { ok: false, reason: patErrorMsg(r.status, await r.json().catch(() => ({}))) };
+    const d = await r.json();
+    return { ok: true, login: d.login };
+  } catch (e) {
+    return { ok: false, reason: 'فشل الاتصال: ' + e.message };
+  }
+}
+
+async function listContents(path) {
+  const url = '/repos/' + REPO + '/contents/' + encodeURIComponent(path).replace(/%2F/g, '/');
+  const r = await ghFetch(url);
+  if (!r.ok) throw new Error(patErrorMsg(r.status, r.data));
+  return Array.isArray(r.data) ? r.data : [r.data];
+}
+
+async function getFileContent(path) {
+  const url = '/repos/' + REPO + '/contents/' + encodeURIComponent(path).replace(/%2F/g, '/');
+  const r = await ghFetch(url);
+  if (!r.ok) throw new Error(patErrorMsg(r.status, r.data));
+  if (Array.isArray(r.data)) throw new Error('المسار مجلد وليس ملف');
+  const content = r.data.content ? b64decode(r.data.content) : '';
+  return { content, sha: r.data.sha };
+}
+
+async function publishSingleFile(file, message) {
+  const url = '/repos/' + REPO + '/contents/' + encodeURIComponent(file.path).replace(/%2F/g, '/');
+  let sha = file.sha;
+  if (!sha) {
+    try {
+      const r = await ghFetch(url);
+      if (r.ok && !Array.isArray(r.data)) sha = r.data.sha;
+    } catch {}
+  }
+  const body = {
+    message,
+    content: b64encode(file.content),
+    branch: 'main'
+  };
+  if (sha) body.sha = sha;
+  const r = await ghFetch(url, { method: 'PUT', body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(patErrorMsg(r.status, r.data));
+  return r.data;
+}
+
+async function publishMultiFile(filesArr, message) {
+  const refR = await ghFetch('/repos/' + REPO + '/git/ref/heads/main');
+  if (!refR.ok) throw new Error(patErrorMsg(refR.status, refR.data));
+  const parentSha = refR.data.object.sha;
+
+  const commitR = await ghFetch('/repos/' + REPO + '/git/commits/' + parentSha);
+  if (!commitR.ok) throw new Error(patErrorMsg(commitR.status, commitR.data));
+  const baseTreeSha = commitR.data.tree.sha;
+
+  const treeEntries = [];
+  for (const f of filesArr) {
+    const blobR = await ghFetch('/repos/' + REPO + '/git/blobs', {
+      method: 'POST',
+      body: JSON.stringify({
+        content: b64encode(f.content),
+        encoding: 'base64'
+      })
+    });
+    if (!blobR.ok) throw new Error('فشل رفع ' + f.path + ': ' + patErrorMsg(blobR.status, blobR.data));
+    treeEntries.push({
+      path: f.path,
+      mode: '100644',
+      type: 'blob',
+      sha: blobR.data.sha
+    });
+  }
+
+  const treeR = await ghFetch('/repos/' + REPO + '/git/trees', {
+    method: 'POST',
+    body: JSON.stringify({ base_tree: baseTreeSha, tree: treeEntries })
+  });
+  if (!treeR.ok) throw new Error(patErrorMsg(treeR.status, treeR.data));
+
+  const newCommitR = await ghFetch('/repos/' + REPO + '/git/commits', {
+    method: 'POST',
+    body: JSON.stringify({
+      message,
+      tree: treeR.data.sha,
+      parents: [parentSha]
+    })
+  });
+  if (!newCommitR.ok) throw new Error(patErrorMsg(newCommitR.status, newCommitR.data));
+
+  const updR = await ghFetch('/repos/' + REPO + '/git/refs/heads/main', {
+    method: 'PATCH',
+    body: JSON.stringify({ sha: newCommitR.data.sha })
+  });
+  if (!updR.ok) throw new Error(patErrorMsg(updR.status, updR.data));
+
+  return updR.data;
+}
+
+/* ============ UNLOCK / LOCK ============ */
+async function unlock(event) {
+  if (event) event.preventDefault();
+  const token = $('patInput').value.trim();
+  if (!token) {
+    showLockError('أدخل PAT أولا');
+    return;
+  }
+  $('unlockBtn').disabled = true;
+  $('unlockBtn').textContent = 'جاري التحقق...';
+  const res = await validatePAT(token);
+  if (res.ok) {
+    PAT = token;
+    username = res.login;
+    sessionStorage.setItem('gm_pat', token);
+    sessionStorage.setItem('gm_user', username);
+    $('userBadge').textContent = username;
+    $('lockScreen').classList.add('hidden');
+    $('patInput').value = '';
+    afterUnlock();
+  } else {
+    showLockError(res.reason);
+    $('unlockBtn').disabled = false;
+    $('unlockBtn').textContent = 'فتح الأداة';
+  }
+}
+
+function showLockError(msg) {
+  const e = $('lockError');
+  e.textContent = msg;
+  e.classList.add('show');
+  setTimeout(() => e.classList.remove('show'), 6000);
+}
+
+function logout() {
+  if (!confirm('خروج وحذف PAT من الجلسة؟')) return;
+  sessionStorage.removeItem('gm_pat');
+  sessionStorage.removeItem('gm_user');
+  PAT = '';
+  username = '';
+  location.reload();
+}
+
+function afterUnlock() {
+  maybeRestoreDraft();
+  startDraftTimer();
+}
+
+/* ============ FILE ROWS ============ */
+function renderFileRows() {
+  const wrap = $('fileRows');
+  wrap.innerHTML = '';
+  files.forEach((f, idx) => wrap.appendChild(buildFileRow(f, idx)));
+  updatePublishBtn();
+}
+
+function buildFileRow(file, idx) {
+  const row = el('div', { class: 'file-row' });
+
+  const header = el('div', { class: 'file-row-header' });
+  header.appendChild(el('span', { class: 'file-row-num' }, '#' + (idx + 1) + (file.isExisting ? ' • تعديل' : ' • جديد')));
+
+  const actionsBox = el('div', { class: 'file-row-actions' });
+  const meta = el('span', { class: 'file-row-meta' }, computeMeta(file.content));
+  actionsBox.appendChild(meta);
+  const removeBtn = el('button', {
+    class: 'file-row-remove',
+    title: 'حذف هذا الصف',
+    onClick: () => removeFileRow(idx)
+  });
+  removeBtn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>';
+  if (files.length === 1) removeBtn.disabled = true;
+  actionsBox.appendChild(removeBtn);
+
+  header.appendChild(actionsBox);
+  row.appendChild(header);
+
+  row.appendChild(el('label', { class: 'label-text' }, 'اسم الملف / المسار'));
+  const pathInput = el('input', {
+    type: 'text',
+    class: 'input',
+    value: file.path || '',
+    placeholder: 'bot/main.py',
+    dir: 'ltr',
+    spellcheck: 'false',
+    autocapitalize: 'off',
+    autocorrect: 'off'
+  });
+  pathInput.addEventListener('input', e => {
+    files[idx].path = e.target.value;
+    updatePreviewLang(idx);
+    updatePublishBtn();
+  });
+  row.appendChild(pathInput);
+
+  row.appendChild(el('label', { class: 'label-text', style: 'margin-top:14px' }, 'المحتوى'));
+  const codeArea = el('textarea', {
+    class: 'code-area',
+    placeholder: 'الصق الكود هنا...',
+    dir: 'ltr',
+    spellcheck: 'false',
+    autocapitalize: 'off',
+    autocorrect: 'off'
+  });
+  codeArea.value = file.content || '';
+  codeArea.addEventListener('input', e => {
+    files[idx].content = e.target.value;
+    meta.textContent = computeMeta(e.target.value);
+    refreshPreview(idx);
+    updatePublishBtn();
+  });
+  row.appendChild(codeArea);
+
+  if (file.isExisting && file.content) {
+    const previewWrap = el('div', { class: 'preview-wrap show', id: 'preview-' + idx });
+    const previewHeader = el('div', { class: 'preview-header' });
+    previewHeader.appendChild(el('span', { class: 'preview-lang' }, detectLang(file.path)));
+    const toggle = el('button', { class: 'preview-toggle' }, 'إخفاء المعاينة');
+    let visible = true;
+    toggle.addEventListener('click', () => {
+      visible = !visible;
+      previewWrap.querySelector('.preview-pre').style.display = visible ? '' : 'none';
+      toggle.textContent = visible ? 'إخفاء المعاينة' : 'عرض المعاينة';
+    });
+    previewHeader.appendChild(toggle);
+    previewWrap.appendChild(previewHeader);
+
+    const pre = el('pre', { class: 'preview-pre' });
+    const code = el('code', { class: 'language-' + detectLang(file.path) });
+    code.textContent = file.content;
+    pre.appendChild(code);
+    previewWrap.appendChild(pre);
+    row.appendChild(previewWrap);
+
+    setTimeout(() => {
+      try { window.hljs && hljs.highlightElement(code); } catch {}
+    }, 0);
+  }
+
+  return row;
+}
+
+function computeMeta(content) {
+  if (!content) return '0 lines';
+  const lines = content.split('\n').length;
+  const bytes = new Blob([content]).size;
+  return lines + ' lines · ' + fmtSize(bytes);
+}
+
+function refreshPreview(idx) {
+  const previewWrap = $('preview-' + idx);
+  if (!previewWrap) return;
+  const code = previewWrap.querySelector('code');
+  if (!code) return;
+  code.className = 'language-' + detectLang(files[idx].path);
+  code.textContent = files[idx].content;
+  delete code.dataset.highlighted;
+  try { window.hljs && hljs.highlightElement(code); } catch {}
+}
+
+function updatePreviewLang(idx) {
+  const previewWrap = $('preview-' + idx);
+  if (!previewWrap) return;
+  const langSpan = previewWrap.querySelector('.preview-lang');
+  if (langSpan) langSpan.textContent = detectLang(files[idx].path);
+  refreshPreview(idx);
+}
+
+function addFileRow(path = '', content = '', sha = null, isExisting = false) {
+  files.push({ path, content, sha, isExisting });
+  renderFileRows();
+}
+
+function removeFileRow(idx) {
+  if (files.length === 1) return;
+  files.splice(idx, 1);
+  renderFileRows();
+}
+
+/* ============ PUBLISH BUTTON LABEL ============ */
+function updatePublishBtn() {
+  const t = $('publishBtnText');
+  if (files.length === 0) { t.textContent = 'نشر إلى GitHub'; return; }
+  if (files.length === 1) { t.textContent = 'نشر إلى GitHub'; return; }
+  t.textContent = 'نشر ' + files.length + ' ملفات';
+}
+
+/* ============ SMART COMMIT MESSAGE ============ */
+function smartCommitMessage() {
+  const custom = $('msgInput').value.trim();
+  if (custom) return custom;
+  if (files.length === 1) {
+    const f = files[0];
+    return (f.isExisting || f.sha) ? ('Update ' + f.path) : ('Add ' + f.path);
+  }
+  if (files.length <= 3) {
+    return 'Update ' + files.map(f => f.path).join(', ');
+  }
+  return 'Update ' + files.length + ' files';
+}
+
+/* ============ PUBLISH ============ */
+async function publish() {
+  if (files.length === 0) return showStatus('error', 'لا توجد ملفات للنشر');
+  for (let i = 0; i < files.length; i++) {
+    if (!files[i].path || !files[i].path.trim()) {
+      return showStatus('error', 'الملف #' + (i + 1) + ': المسار فارغ');
+    }
+    if (!files[i].content || files[i].content.length === 0) {
+      return showStatus('error', 'الملف #' + (i + 1) + ': المحتوى فارغ');
+    }
+  }
+
+  const totalBytes = files.reduce((s, f) => s + new Blob([f.content]).size, 0);
+  if (totalBytes > HARD_SIZE_LIMIT) {
+    return showStatus('error', 'الحجم ' + fmtSize(totalBytes) + ' تجاوز الحد ١٠٠ ميجا');
+  }
+  if (totalBytes > SOFT_SIZE_LIMIT) {
+    if (!confirm('الحجم الإجمالي ' + fmtSize(totalBytes) + '. يتجاوز ١ ميجا. الاستمرار؟')) return;
+  }
+
+  $('publishBtn').disabled = true;
+  const msg = smartCommitMessage();
+
+  try {
+    if (files.length === 1) {
+      showStatus('loading', 'جاري النشر...');
+      await publishSingleFile(files[0], msg);
+    } else {
+      showStatus('loading', 'نشر ' + files.length + ' ملفات في commit واحد...');
+      await publishMultiFile(files, msg);
+    }
+
+    showStatus('success', files.length === 1
+      ? 'تم نشر ' + files[0].path
+      : 'تم نشر ' + files.length + ' ملفات بنجاح');
+
+    addLogEntry({
+      paths: files.map(f => f.path),
+      msg,
+      date: Date.now(),
+      count: files.length
+    });
+
+    files.forEach(f => addRecent(f.path));
+
+    files = [];
+    $('msgInput').value = '';
+    addFileRow();
+    clearDraft();
+
+    if (mode === 'edit') browse(currentBrowsePath);
+
+  } catch (e) {
+    showStatus('error', e.message || 'فشل النشر');
+  } finally {
+    $('publishBtn').disabled = false;
+  }
+}
+
+/* ============ LOG ============ */
+function addLogEntry(entry) {
+  logs.unshift(entry);
+  logs = logs.slice(0, MAX_LOGS);
+  writeLS('gm_logs', logs);
+  renderLogs();
+}
+
+function renderLogs() {
+  const list = $('logList');
+  if (logs.length === 0) {
+    list.innerHTML = '<div class="log-empty">لم تقم بأي نشر بعد</div>';
+  } else {
+    list.innerHTML = logs.map(l => {
+      const isMulti = (l.count && l.count > 1) || (Array.isArray(l.paths) && l.paths.length > 1);
+      const label = isMulti
+        ? (l.count + ' ملفات: ' + l.paths.slice(0, 2).join(', ') + (l.paths.length > 2 ? '...' : ''))
+        : (l.paths ? l.paths[0] : (l.path || ''));
+      const iconClass = isMulti ? 'log-icon multi' : 'log-icon';
+      const iconSvg = isMulti
+        ? '<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>'
+        : '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+      return '<div class="log-item">'
+        + '<div class="' + iconClass + '">' + iconSvg + '</div>'
+        + '<div class="log-content">'
+        + '<div class="log-filename">' + escapeHtml(label) + '</div>'
+        + '<div class="log-msg">' + escapeHtml(l.msg || '') + '</div>'
+        + '</div>'
+        + '<span class="log-time">' + timeAgo(l.date) + '</span>'
+        + '</div>';
+    }).join('');
+  }
+  $('logMeta').textContent = logs.length + ' commits';
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+/* ============ RECENT FILES ============ */
+function addRecent(path) {
+  if (!path) return;
+  recent = [path, ...recent.filter(p => p !== path)].slice(0, MAX_RECENT);
+  writeLS('gm_recent', recent);
+  renderRecent();
+}
+
+function clearRecent() {
+  if (!confirm('مسح قائمة الملفات الحديثة؟')) return;
+  recent = [];
+  writeLS('gm_recent', recent);
+  renderRecent();
+}
+
+function renderRecent() {
+  const sec = $('recentSection');
+  const chips = $('recentChips');
+  if (recent.length === 0) {
+    sec.classList.remove('show');
+    return;
+  }
+  sec.classList.add('show');
+  chips.innerHTML = '';
+  recent.forEach(p => {
+    const chip = el('button', {
+      class: 'chip',
+      onClick: () => loadFileIntoNewRow(p)
+    });
+    chip.innerHTML = '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
+      + '<span>' + escapeHtml(p) + '</span>';
+    chips.appendChild(chip);
+  });
+}
+
+async function loadFileIntoNewRow(path) {
+  showStatus('loading', 'جاري تحميل ' + path);
+  try {
+    const { content, sha } = await getFileContent(path);
+    if (files.length === 1 && !files[0].path && !files[0].content) {
+      files[0] = { path, content, sha, isExisting: true };
+    } else {
+      files.push({ path, content, sha, isExisting: true });
+    }
+    renderFileRows();
+    hideStatus();
+  } catch (e) {
+    showStatus('error', e.message);
+  }
+}
+
+/* ============ FILE BROWSER ============ */
+async function browse(path) {
+  currentBrowsePath = path;
+  const display = path ? ('pocket-studio/' + path) : 'pocket-studio/';
+  $('browserPath').textContent = display;
+  $('browserBack').disabled = !path;
+  const list = $('browserList');
+  list.innerHTML = '<div class="browser-loading"><span class="spinner"></span><span>جاري التحميل...</span></div>';
+  try {
+    const items = await listContents(path);
+    if (!items || items.length === 0) {
+      list.innerHTML = '<div class="browser-empty">مجلد فارغ</div>';
+      return;
+    }
+    items.sort((a, b) => {
+      if (a.type !== b.type) return a.type === 'dir' ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    });
+    list.innerHTML = '';
+    items.forEach(item => {
+      const row = el('div', {
+        class: 'browser-item',
+        onClick: () => onBrowserItemClick(item)
+      });
+      const iconBox = el('div', { class: 'browser-icon' + (item.type === 'dir' ? ' dir' : '') });
+      iconBox.innerHTML = item.type === 'dir'
+        ? '<svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'
+        : '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+      row.appendChild(iconBox);
+      row.appendChild(el('span', { class: 'browser-name' + (item.type === 'dir' ? ' dir' : '') }, item.name + (item.type === 'dir' ? '/' : '')));
+      list.appendChild(row);
+    });
+  } catch (e) {
+    list.innerHTML = '<div class="browser-empty" style="color:var(--error)">' + escapeHtml(e.message) + '</div>';
+  }
+}
+
+async function onBrowserItemClick(item) {
+  if (item.type === 'dir') {
+    browse(item.path);
+  } else {
+    await loadFileIntoNewRow(item.path);
+    setMode('new');
+  }
+}
+
+function browserBack() {
+  if (!currentBrowsePath) return;
+  const parts = currentBrowsePath.split('/').filter(Boolean);
+  parts.pop();
+  browse(parts.join('/'));
+}
+
+/* ============ MODE / TABS ============ */
+function setMode(m) {
+  mode = m;
+  $('tabNew').classList.toggle('active', m === 'new');
+  $('tabEdit').classList.toggle('active', m === 'edit');
+  $('browserSection').classList.toggle('show', m === 'edit');
+  if (m === 'edit') browse(currentBrowsePath);
+}
+
+/* ============ ATTACH FILE ============ */
+function handleAttach(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const content = e.target.result;
+    if (files.length === 1 && !files[0].path && !files[0].content) {
+      files[0] = { path: file.name, content, sha: null, isExisting: false };
+    } else {
+      files.push({ path: file.name, content, sha: null, isExisting: false });
+    }
+    renderFileRows();
+    showStatus('success', 'تم إرفاق ' + file.name);
+  };
+  reader.onerror = () => showStatus('error', 'فشل قراءة الملف');
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+/* ============ AUTO-SAVE DRAFT ============ */
+function saveDraft() {
+  const hasContent = files.some(f => f.content && f.content.length > 0);
+  if (!hasContent) return;
+  const payload = {
+    files: files.map(f => ({
+      path: f.path,
+      content: f.content,
+      isExisting: f.isExisting,
+      sha: f.sha
+    })),
+    timestamp: Date.now()
+  };
+  const hash = JSON.stringify(payload.files);
+  if (hash === lastDraftHash) return;
+  lastDraftHash = hash;
+  writeLS('gm_draft', payload);
+  flashDraftIndicator();
+}
+
+function clearDraft() {
+  localStorage.removeItem('gm_draft');
+  lastDraftHash = '';
+}
+
+function maybeRestoreDraft() {
+  const draft = readLS('gm_draft', null);
+  if (!draft || !draft.files || draft.files.length === 0) return;
+  const age = Date.now() - (draft.timestamp || 0);
+  if (age > DRAFT_TTL) {
+    clearDraft();
+    return;
+  }
+  if (!draft.files.some(f => f.content && f.content.length > 0)) return;
+  const ageMins = Math.round(age / 60000);
+  const ageStr = ageMins < 60 ? (ageMins + ' دقيقة') : (Math.round(ageMins / 60) + ' ساعة');
+  if (confirm('عندك مسودة محفوظة من قبل ' + ageStr + ' (' + draft.files.length + ' ملف). استرجاعها؟')) {
+    files = draft.files;
+    renderFileRows();
+  } else {
+    clearDraft();
+  }
+}
+
+function flashDraftIndicator() {
+  const el = $('draftIndicator');
+  el.classList.add('show');
+  clearTimeout(flashDraftIndicator._t);
+  flashDraftIndicator._t = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+function startDraftTimer() {
+  if (draftTimer) clearInterval(draftTimer);
+  draftTimer = setInterval(saveDraft, DRAFT_SAVE_INTERVAL);
+}
+
+/* ============ INIT ============ */
+function init() {
+  $('lockForm').addEventListener('submit', unlock);
+  $('patInput').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(e); });
+  $('logoutBtn').addEventListener('click', logout);
+  $('renderBtn').addEventListener('click', () => window.open('https://dashboard.render.com', '_blank'));
+  $('publishBtn').addEventListener('click', publish);
+  $('addFileBtn').addEventListener('click', () => addFileRow());
+  $('attachFileBtn').addEventListener('click', () => $('fileInput').click());
+  $('fileInput').addEventListener('change', handleAttach);
+  $('tabNew').addEventListener('click', () => setMode('new'));
+  $('tabEdit').addEventListener('click', () => setMode('edit'));
+  $('browserBack').addEventListener('click', browserBack);
+  $('recentClearBtn').addEventListener('click', clearRecent);
+
+  if (files.length === 0) addFileRow();
+  renderLogs();
+  renderRecent();
+
+  if (PAT && username) {
+    $('userBadge').textContent = username;
+    $('lockScreen').classList.add('hidden');
+    afterUnlock();
+  }
+}
+
+init();
 </script>
 </body>
 </html>

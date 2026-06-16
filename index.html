@@ -154,14 +154,11 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 /* Version badge in topbar */
 .version-badge{font-family:var(--font-mono);font-size:9px;font-weight:500;color:var(--accent);background:var(--accent-soft);padding:2px 6px;border-radius:6px;letter-spacing:0.04em;direction:ltr;margin-right:6px}
 
-/* Long-press menu for browser items */
-.context-menu{position:fixed;background:var(--surface-outer);border:1px solid var(--hairline);border-radius:12px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,0.6);z-index:1000;min-width:160px;display:none}
-.context-menu.show{display:block;animation:slideDown 200ms var(--ease)}
-.context-menu-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:none;border:none;border-radius:8px;width:100%;color:var(--ink-primary);font-family:var(--font-body);font-size:13px;cursor:pointer;text-align:right;direction:rtl}
-.context-menu-item:hover{background:var(--highlight)}
-.context-menu-item.danger{color:var(--error)}
-.context-menu-item.danger:hover{background:var(--error-soft)}
-.context-menu-item svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
+/* Inline delete button on browser items (replaces long-press) */
+.browser-delete-btn{width:24px;height:24px;border-radius:6px;background:var(--surface-input);border:1px solid var(--hairline);display:flex;align-items:center;justify-content:center;color:var(--ink-tertiary);cursor:pointer;flex-shrink:0;padding:0;transition:all 200ms var(--ease)}
+.browser-delete-btn:hover,.browser-delete-btn:active{color:var(--error);border-color:rgba(252,165,165,0.3);background:var(--error-soft)}
+.browser-delete-btn:active{transform:scale(0.9)}
+.browser-delete-btn svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none}
 
 /* ============ FILE BROWSER ============ */
 .browser{margin:0 16px 12px;padding:6px;background:var(--surface-outer);border:1px solid var(--hairline);border-radius:18px;display:none}
@@ -582,23 +579,11 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
   <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
 </div>
 
-<!-- CONTEXT MENU (for browser file long-press) -->
-<div class="context-menu" id="ctxMenu">
-  <button type="button" class="context-menu-item" id="ctxLoadBtn">
-    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-    <span>تحميل للتعديل</span>
-  </button>
-  <button type="button" class="context-menu-item danger" id="ctxDeleteBtn">
-    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
-    <span>حذف من GitHub</span>
-  </button>
-</div>
-
 <script>
 'use strict';
 
 /* ============ CONSTANTS ============ */
-const VERSION = 'v0.2.7';
+const VERSION = 'v0.2.8';
 const DEFAULT_REPO = 'pocketstudio-dev/pocket-studio';
 const SEED_REPOS = ['pocketstudio-dev/pocket-studio', 'pocketstudio-dev/gm-publisher'];
 
@@ -1389,6 +1374,23 @@ async function browse(path) {
         : '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
       row.appendChild(iconBox);
 
+      // Delete button (files only)
+      if (item.type === 'file') {
+        const delBtn = el('button', {
+          type: 'button',
+          class: 'browser-delete-btn',
+          title: 'حذف من GitHub'
+        });
+        delBtn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>';
+        delBtn.addEventListener('click', (e) => {
+          // Prevent row click (which would load the file)
+          e.preventDefault();
+          e.stopPropagation();
+          handleDeleteFile(item);
+        });
+        row.appendChild(delBtn);
+      }
+
       // Name + size row
       const nameRow = el('div', { class: 'browser-name-row' });
       nameRow.appendChild(el('span', { class: 'browser-name' + (item.type === 'dir' ? ' dir' : '') },
@@ -1399,10 +1401,6 @@ async function browse(path) {
       }
       row.appendChild(nameRow);
 
-      // Long press handler (for files only - context menu)
-      if (item.type === 'file') {
-        attachLongPress(row, item);
-      }
       list.appendChild(row);
     });
   } catch (e) {
@@ -1410,101 +1408,8 @@ async function browse(path) {
   }
 }
 
-/* Long-press detection for context menu */
-function attachLongPress(elem, item) {
-  let timer = null;
-  let startX = 0, startY = 0;
-  let moved = false;
-  let longPressed = false;
-
-  const start = (e) => {
-    longPressed = false;
-    const touch = e.touches ? e.touches[0] : e;
-    startX = touch.clientX;
-    startY = touch.clientY;
-    moved = false;
-    timer = setTimeout(() => {
-      if (!moved) {
-        longPressed = true;
-        showContextMenu(touch.clientX, touch.clientY, item);
-      }
-    }, 500);
-  };
-  const move = (e) => {
-    const touch = e.touches ? e.touches[0] : e;
-    if (Math.abs(touch.clientX - startX) > 8 || Math.abs(touch.clientY - startY) > 8) {
-      moved = true;
-      clearTimeout(timer);
-    }
-  };
-  const end = () => clearTimeout(timer);
-
-  elem.addEventListener('touchstart', start, { passive: true });
-  elem.addEventListener('touchmove', move, { passive: true });
-  elem.addEventListener('touchend', end);
-  elem.addEventListener('touchcancel', end);
-  // Desktop fallback
-  elem.addEventListener('mousedown', start);
-  elem.addEventListener('mousemove', move);
-  elem.addEventListener('mouseup', end);
-  elem.addEventListener('mouseleave', end);
-
-  // Suppress the synthetic click that fires AFTER long-press
-  // (use capture phase + stopImmediatePropagation to block all later handlers)
-  elem.addEventListener('click', (e) => {
-    if (longPressed) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      // Reset on next tick so next genuine click works
-      setTimeout(() => { longPressed = false; }, 50);
-    }
-  }, true);
-}
-
-let _ctxItem = null;
-function showContextMenu(x, y, item) {
-  _ctxItem = item;
-  const menu = $('ctxMenu');
-  // Force re-attach to body (in case ancestor transform/filter breaks position:fixed)
-  if (menu.parentNode !== document.body) {
-    document.body.appendChild(menu);
-  }
-  // Force position:fixed inline to override anything
-  menu.style.position = 'fixed';
-  menu.style.display = 'block';
-  // Measure after display:block (offsetWidth is 0 if display:none)
-  const w = menu.offsetWidth || 180;
-  const h = menu.offsetHeight || 100;
-  const maxX = window.innerWidth - w - 10;
-  const maxY = window.innerHeight - h - 10;
-  menu.style.left = Math.min(Math.max(10, x), maxX) + 'px';
-  menu.style.top = Math.min(Math.max(10, y), maxY) + 'px';
-  menu.classList.add('show');
-  // Close on scroll (UX safety net)
-  window.addEventListener('scroll', hideContextMenu, { once: true, passive: true });
-}
-
-function hideContextMenu() {
-  const menu = $('ctxMenu');
-  menu.classList.remove('show');
-  menu.style.display = 'none';
-  _ctxItem = null;
-}
-
-async function ctxLoad() {
-  const item = _ctxItem;
-  hideContextMenu();
-  if (!item) return;
-  syncEditorRepo();
-  await loadFileIntoNewRow(item.path);
-  showStatus('success', 'تم تحميل ' + item.path);
-}
-
-async function ctxDelete() {
-  const item = _ctxItem;
-  hideContextMenu();
-  if (!item) return;
+/* Delete file from GitHub (called by inline delete button) */
+async function handleDeleteFile(item) {
   if (!confirm('حذف ' + item.path + ' من ' + BROWSER_REPO() + '؟\n\nهذا الإجراء يحذف الملف من GitHub ولا يمكن التراجع عنه.')) return;
   showStatus('loading', 'جاري حذف ' + item.path);
   try {
@@ -1912,17 +1817,6 @@ function init() {
   $('recentClearBtn').addEventListener('click', clearRecent);
   $('draftRestoreBtn').addEventListener('click', restoreDraft);
   $('draftDismissBtn').addEventListener('click', dismissDraft);
-
-  // Context menu
-  $('ctxLoadBtn').addEventListener('click', ctxLoad);
-  $('ctxDeleteBtn').addEventListener('click', ctxDelete);
-  // Close context menu on outside click
-  document.addEventListener('click', (e) => {
-    const menu = $('ctxMenu');
-    if (menu.classList.contains('show') && !menu.contains(e.target)) {
-      hideContextMenu();
-    }
-  });
 
   // Initial state
   if (files.length === 0) addFileRow();

@@ -272,6 +272,24 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 .icon-btn.deploy-active{color:var(--success);border-color:rgba(110,231,183,0.3)}
 .icon-btn.deploy-active:hover{color:var(--success)}
 
+/* ============ FIELD-LEVEL MESSAGE OVERLAY ============ */
+/* Inline banner shown above a specific textarea/input when validation
+   or a user action fails on that specific field. Pairs with a colored
+   border on the target field for visual reinforcement. */
+.field-message-wrap{margin-top:8px;display:none}
+.field-message-wrap.show{display:block;animation:slideDown 220ms var(--ease)}
+.field-message{padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.5;display:flex;align-items:flex-start;gap:8px}
+.field-message-icon{flex-shrink:0;margin-top:1px;display:flex}
+.field-message-icon svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+.field-message-text{flex:1;min-width:0}
+.field-message.warn{background:var(--warn-soft);border:1px solid rgba(252,211,77,0.3);color:var(--warn)}
+.field-message.error{background:var(--error-soft);border:1px solid rgba(252,165,165,0.3);color:var(--error)}
+/* Colored borders on the target field */
+.code-area.has-warn{border-color:rgba(252,211,77,0.6)!important;box-shadow:0 0 0 3px var(--warn-soft)!important}
+.code-area.has-error{border-color:rgba(252,165,165,0.6)!important;box-shadow:0 0 0 3px var(--error-soft)!important}
+.input.has-warn{border-color:rgba(252,211,77,0.6)!important;box-shadow:0 0 0 3px var(--warn-soft)!important}
+.input.has-error{border-color:rgba(252,165,165,0.6)!important;box-shadow:0 0 0 3px var(--error-soft)!important}
+
 /* ============ COMMIT + PUBLISH ============ */
 .commit-row{padding:16px 20px;border-bottom:1px solid var(--hairline)}
 .actions{padding:20px;display:flex;gap:10px;align-items:center}
@@ -1065,6 +1083,7 @@ function buildFileRow(file, idx) {
     files[idx].path = e.target.value;
     updatePreviewLang(idx);
     updatePublishBtn();
+    clearFieldMessage(idx);
   });
   row.appendChild(pathInput);
 
@@ -1103,6 +1122,11 @@ function buildFileRow(file, idx) {
 
   row.appendChild(contentActions);
 
+  // Field-level message slot (shown above textarea on validation failures
+  // or user actions related to THIS specific file row).
+  const fieldMsgWrap = el('div', { class: 'field-message-wrap' });
+  row.appendChild(fieldMsgWrap);
+
   const codeArea = el('textarea', {
     class: 'code-area',
     placeholder: 'الصق الكود هنا...',
@@ -1117,6 +1141,7 @@ function buildFileRow(file, idx) {
     meta.textContent = computeMeta(e.target.value);
     refreshPreview(idx);
     updatePublishBtn();
+    clearFieldMessage(idx);
   });
   row.appendChild(codeArea);
 
@@ -1215,12 +1240,18 @@ function smartCommitMessage() {
 async function publish() {
   // Validate
   if (files.length === 0) return showStatus('error', 'لا توجد ملفات للنشر');
+
+  // Clear any field messages from previous validation attempts
+  clearAllFieldMessages();
+
   for (let i = 0; i < files.length; i++) {
     if (!files[i].path || !files[i].path.trim()) {
-      return showStatus('error', 'الملف #' + (i + 1) + ': المسار فارغ');
+      showFieldMessage(i, 'error', 'المسار فارغ - أدخل اسم الملف', { target: 'path' });
+      return;
     }
     if (!files[i].content || files[i].content.length === 0) {
-      return showStatus('error', 'الملف #' + (i + 1) + ': المحتوى فارغ');
+      showFieldMessage(i, 'error', 'المحتوى فارغ - أدخل أو الصق الكود');
+      return;
     }
   }
 
@@ -1803,17 +1834,98 @@ function _syncContentUI(idx, newContent) {
   updatePublishBtn();
 }
 
+/* ============ FIELD-LEVEL MESSAGES (overlay on textarea/input) ============ */
+/* Show a contextual message above the textarea (or path input) for a given
+   file row. Colors the field border too. Auto-clears on:
+     - timeout (7 seconds, safety net)
+     - field focus / first touch (user acknowledges)
+     - the user typing in that field (input event)
+     - the user pressing the "مسح" button (clearContent)
+     - successful re-validation on the next publish attempt
+   Falls back to a toast if the row no longer exists. */
+function showFieldMessage(idx, type, text, options) {
+  options = options || {};
+  const target = options.target || 'content'; // 'content' or 'path'
+  const rowEl = $('fileRows').children[idx];
+  if (!rowEl) {
+    showStatus(type, text);
+    return;
+  }
+  const msgWrap = rowEl.querySelector('.field-message-wrap');
+  const codeArea = rowEl.querySelector('.code-area');
+  const pathInput = rowEl.querySelector('.input');
+  if (!msgWrap) {
+    showStatus(type, text);
+    return;
+  }
+
+  const iconSvg = (type === 'error')
+    ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+    : '<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+
+  msgWrap.innerHTML = '<div class="field-message ' + type + '">'
+    + '<div class="field-message-icon">' + iconSvg + '</div>'
+    + '<div class="field-message-text">' + escapeHtml(text) + '</div>'
+    + '</div>';
+  msgWrap.classList.add('show');
+
+  // Color the relevant field's border
+  if (codeArea) codeArea.classList.remove('has-warn', 'has-error');
+  if (pathInput) pathInput.classList.remove('has-warn', 'has-error');
+  const targetEl = (target === 'path') ? pathInput : codeArea;
+  if (targetEl) targetEl.classList.add('has-' + type);
+
+  // 7-second safety timeout
+  if (msgWrap._timer) clearTimeout(msgWrap._timer);
+  msgWrap._timer = setTimeout(() => clearFieldMessage(idx), 7000);
+
+  // First-touch / focus auto-clear (once-only listener)
+  const clearOnce = () => clearFieldMessage(idx);
+  if (codeArea) {
+    codeArea.addEventListener('focus', clearOnce, { once: true });
+    codeArea.addEventListener('touchstart', clearOnce, { once: true, passive: true });
+  }
+  if (target === 'path' && pathInput) {
+    pathInput.addEventListener('focus', clearOnce, { once: true });
+    pathInput.addEventListener('touchstart', clearOnce, { once: true, passive: true });
+  }
+
+  // Scroll the message into view (it's just above the target field)
+  msgWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function clearFieldMessage(idx) {
+  const rowEl = $('fileRows').children[idx];
+  if (!rowEl) return;
+  const msgWrap = rowEl.querySelector('.field-message-wrap');
+  if (msgWrap) {
+    msgWrap.classList.remove('show');
+    if (msgWrap._timer) {
+      clearTimeout(msgWrap._timer);
+      msgWrap._timer = null;
+    }
+  }
+  const codeArea = rowEl.querySelector('.code-area');
+  if (codeArea) codeArea.classList.remove('has-warn', 'has-error');
+  const pathInput = rowEl.querySelector('.input');
+  if (pathInput) pathInput.classList.remove('has-warn', 'has-error');
+}
+
+function clearAllFieldMessages() {
+  for (let i = 0; i < files.length; i++) clearFieldMessage(i);
+}
+
 async function copyContent(idx) {
   const content = files[idx] && files[idx].content || '';
   if (!content) {
-    showStatus('warn', 'لا يوجد محتوى للنسخ');
+    showFieldMessage(idx, 'warn', 'لا يوجد محتوى للنسخ');
     return;
   }
   try {
     await navigator.clipboard.writeText(content);
     showStatus('success', 'تم نسخ المحتوى (' + content.length + ' حرف)');
   } catch (e) {
-    showStatus('error', 'فشل النسخ: ' + (e.message || 'الجوال لا يدعم Clipboard API'));
+    showFieldMessage(idx, 'error', 'فشل النسخ: ' + (e.message || 'الجوال لا يدعم Clipboard API'));
   }
 }
 
@@ -1824,25 +1936,26 @@ function clearContent(idx) {
     return;
   }
   _syncContentUI(idx, '');
+  clearFieldMessage(idx);
   showStatus('success', 'تم مسح المحتوى');
 }
 
 async function pasteContent(idx) {
   const existing = files[idx] && files[idx].content || '';
   if (existing.length > 0) {
-    showStatus('warn', 'المربع فيه محتوى. اضغط "مسح" أولاً ثم "لصق".');
+    showFieldMessage(idx, 'warn', 'المربع فيه محتوى. اضغط "مسح" أولاً ثم "لصق".');
     return;
   }
   try {
     const text = await navigator.clipboard.readText();
     if (!text) {
-      showStatus('warn', 'الحافظة فارغة');
+      showFieldMessage(idx, 'warn', 'الحافظة فارغة');
       return;
     }
     _syncContentUI(idx, text);
     showStatus('success', 'تم لصق المحتوى (' + text.length + ' حرف)');
   } catch (e) {
-    showStatus('error', 'فشل اللصق: ' + (e.message || 'الجوال لا يدعم Clipboard API'));
+    showFieldMessage(idx, 'error', 'فشل اللصق: ' + (e.message || 'الجوال لا يدعم Clipboard API'));
   }
 }
 

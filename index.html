@@ -260,6 +260,18 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 .add-btn:active{transform:scale(0.97)}
 .add-btn svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
 
+/* ============ CONTENT ACTIONS (Copy / Clear / Paste, above textarea) ============ */
+.content-actions{display:flex;gap:6px;margin-top:8px;margin-bottom:0}
+.content-btn{flex:1;padding:8px 10px;background:var(--surface-input);border:1px solid var(--hairline);border-radius:8px;color:var(--ink-secondary);font-family:var(--font-body);font-size:11px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 200ms var(--ease)}
+.content-btn:hover{color:var(--accent);border-color:rgba(196,165,114,0.3)}
+.content-btn:active{transform:scale(0.95)}
+.content-btn svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none}
+.content-btn.danger:hover{color:var(--error);border-color:rgba(252,165,165,0.3)}
+
+/* ============ DEPLOY BUTTON STATE ============ */
+.icon-btn.deploy-active{color:var(--success);border-color:rgba(110,231,183,0.3)}
+.icon-btn.deploy-active:hover{color:var(--success)}
+
 /* ============ COMMIT + PUBLISH ============ */
 .commit-row{padding:16px 20px;border-bottom:1px solid var(--hairline)}
 .actions{padding:20px;display:flex;gap:10px;align-items:center}
@@ -382,6 +394,11 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
           <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
         </svg>
       </button>
+      <button type="button" class="icon-btn" id="deployBtn" title="إعداد Deploy Hook + إطلاق Deploy">
+        <svg viewBox="0 0 24 24">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+      </button>
       <button type="button" class="icon-btn" id="renderBtn" title="افتح Render Dashboard">
         <svg viewBox="0 0 24 24">
           <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
@@ -462,6 +479,28 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
       <div class="publish-confirm-actions">
         <button type="button" class="draft-btn" id="publishConfirmCancel">إلغاء</button>
         <button type="button" class="draft-btn primary" id="publishConfirmYes">تأكيد النشر</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEPLOY HOOK BANNER -->
+  <section class="repo-mgmt-banner" id="deployBanner">
+    <div class="repo-mgmt-inner">
+      <div class="repo-mgmt-header">
+        <h3 class="repo-mgmt-title">إطلاق Deploy في Render</h3>
+        <button type="button" class="repo-mgmt-close" id="deployBannerClose" title="إغلاق">×</button>
+      </div>
+      <label class="label-text" for="deployHookInput">Deploy Hook URL</label>
+      <input type="text" class="input" id="deployHookInput"
+             placeholder="https://api.render.com/deploy/srv-..."
+             dir="ltr" spellcheck="false"
+             autocapitalize="off" autocorrect="off">
+      <div class="repo-mgmt-hint">
+        Render Dashboard ← Settings ← Deploy Hook
+      </div>
+      <div class="repo-mgmt-actions">
+        <button type="button" class="draft-btn" id="deployBannerCancel">إلغاء</button>
+        <button type="button" class="draft-btn primary" id="deployBannerSubmit">حفظ وإطلاق</button>
       </div>
     </div>
   </section>
@@ -620,7 +659,7 @@ body{min-height:100dvh;font-family:var(--font-body);font-size:15px;line-height:1
 'use strict';
 
 /* ============ CONSTANTS ============ */
-const VERSION = 'v0.2.11';
+const VERSION = 'v0.2.12';
 const DEFAULT_REPO = 'pocketstudio-dev/pocket-studio';
 const SEED_REPOS = ['pocketstudio-dev/pocket-studio', 'pocketstudio-dev/gm-publisher'];
 
@@ -1031,6 +1070,39 @@ function buildFileRow(file, idx) {
 
   // Content textarea
   row.appendChild(el('label', { class: 'label-text', style: 'margin-top:14px' }, 'المحتوى'));
+
+  // 3-button action row above textarea: copy / clear / paste
+  const contentActions = el('div', { class: 'content-actions' });
+
+  const copyBtn = el('button', {
+    type: 'button',
+    class: 'content-btn',
+    title: 'نسخ محتوى الملف للحافظة',
+    onClick: () => copyContent(idx)
+  });
+  copyBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>نسخ</span>';
+  contentActions.appendChild(copyBtn);
+
+  const clearBtn = el('button', {
+    type: 'button',
+    class: 'content-btn danger',
+    title: 'مسح محتوى الملف',
+    onClick: () => clearContent(idx)
+  });
+  clearBtn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg><span>مسح</span>';
+  contentActions.appendChild(clearBtn);
+
+  const pasteBtn = el('button', {
+    type: 'button',
+    class: 'content-btn',
+    title: 'لصق من الحافظة',
+    onClick: () => pasteContent(idx)
+  });
+  pasteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg><span>لصق</span>';
+  contentActions.appendChild(pasteBtn);
+
+  row.appendChild(contentActions);
+
   const codeArea = el('textarea', {
     class: 'code-area',
     placeholder: 'الصق الكود هنا...',
@@ -1715,6 +1787,138 @@ function handleAttach(event) {
   event.target.value = ''; // Reset so same file can be picked again
 }
 
+/* ============ CONTENT ACTIONS (Copy / Clear / Paste) ============ */
+
+/* Helper: update textarea + meta + preview after content change */
+function _syncContentUI(idx, newContent) {
+  files[idx].content = newContent;
+  const rowEl = $('fileRows').children[idx];
+  if (rowEl) {
+    const ta = rowEl.querySelector('.code-area');
+    if (ta) ta.value = newContent;
+    const meta = rowEl.querySelector('.file-row-meta');
+    if (meta) meta.textContent = computeMeta(newContent);
+  }
+  refreshPreview(idx);
+  updatePublishBtn();
+}
+
+async function copyContent(idx) {
+  const content = files[idx] && files[idx].content || '';
+  if (!content) {
+    showStatus('warn', 'لا يوجد محتوى للنسخ');
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(content);
+    showStatus('success', 'تم نسخ المحتوى (' + content.length + ' حرف)');
+  } catch (e) {
+    showStatus('error', 'فشل النسخ: ' + (e.message || 'الجوال لا يدعم Clipboard API'));
+  }
+}
+
+function clearContent(idx) {
+  const content = files[idx] && files[idx].content || '';
+  if (!content) return;
+  if (content.length > 50 && !confirm('مسح ' + content.length + ' حرف من المحتوى؟ لا يمكن التراجع.')) {
+    return;
+  }
+  _syncContentUI(idx, '');
+  showStatus('success', 'تم مسح المحتوى');
+}
+
+async function pasteContent(idx) {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (!text) {
+      showStatus('warn', 'الحافظة فارغة');
+      return;
+    }
+    _syncContentUI(idx, text);
+    showStatus('success', 'تم لصق المحتوى (' + text.length + ' حرف)');
+  } catch (e) {
+    showStatus('error', 'فشل اللصق: ' + (e.message || 'الجوال لا يدعم Clipboard API'));
+  }
+}
+
+/* ============ RENDER DEPLOY HOOK ============ */
+const DEPLOY_HOOK_KEY = 'gm_deploy_hook';
+
+function getDeployHook() {
+  try { return localStorage.getItem(DEPLOY_HOOK_KEY) || ''; }
+  catch { return ''; }
+}
+
+function setDeployHook(url) {
+  try {
+    if (url) localStorage.setItem(DEPLOY_HOOK_KEY, url);
+    else localStorage.removeItem(DEPLOY_HOOK_KEY);
+  } catch (e) { console.warn('Deploy hook save failed:', e); }
+  updateDeployBtnState();
+}
+
+function updateDeployBtnState() {
+  const btn = $('deployBtn');
+  if (!btn) return;
+  if (getDeployHook()) {
+    btn.classList.add('deploy-active');
+    btn.title = 'إطلاق Deploy في Render (Hook محفوظ)';
+  } else {
+    btn.classList.remove('deploy-active');
+    btn.title = 'إعداد Deploy Hook + إطلاق Deploy';
+  }
+}
+
+function showDeployBanner() {
+  hideAddRepo();
+  hideManageRepo();
+  $('deployHookInput').value = getDeployHook();
+  $('deployBanner').classList.add('show');
+  setTimeout(() => {
+    $('deployBanner').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    $('deployHookInput').focus();
+  }, 100);
+}
+
+function hideDeployBanner() {
+  $('deployBanner').classList.remove('show');
+}
+
+function handleDeployClick() {
+  // Always open banner: pre-filled if URL exists.
+  // User clicks "حفظ وإطلاق" inside to actually deploy.
+  // This keeps URL editable anytime without hidden gestures.
+  showDeployBanner();
+}
+
+async function handleDeploySubmit() {
+  const url = $('deployHookInput').value.trim();
+  if (!url) {
+    showStatus('error', 'الـ URL فارغ');
+    return;
+  }
+  if (!/^https:\/\/api\.render\.com\/deploy\//.test(url)) {
+    if (!confirm('الـ URL لا يبدأ بـ https://api.render.com/deploy/\nمتأكد إنه Deploy Hook صحيح؟')) {
+      return;
+    }
+  }
+  setDeployHook(url);
+  hideDeployBanner();
+  await triggerDeploy(url);
+}
+
+async function triggerDeploy(url) {
+  showStatus('loading', 'جاري إطلاق Deploy في Render...');
+  try {
+    // Use no-cors to bypass CORS (Render Deploy Hooks don't set CORS headers).
+    // Response is opaque (we can't read status), but the hook does fire.
+    await fetch(url, { method: 'POST', mode: 'no-cors' });
+    showStatus('success', 'تم إرسال طلب Deploy — راقب التقدم في Render Dashboard');
+  } catch (e) {
+    showStatus('error', 'فشل إطلاق Deploy: ' + e.message);
+  }
+}
+
 /* ============ AUTO-SAVE DRAFT ============ */
 function saveDraft() {
   // Only save if there's actual content
@@ -1842,7 +2046,9 @@ function init() {
 
   // Topbar
   $('refreshBtn').addEventListener('click', refreshApp);
+  $('deployBtn').addEventListener('click', handleDeployClick);
   $('renderBtn').addEventListener('click', () => window.open('https://dashboard.render.com', '_blank'));
+  updateDeployBtnState();
 
   // Publish + file actions
   $('publishBtn').addEventListener('click', publish);
@@ -1877,6 +2083,12 @@ function init() {
   // Delete confirm
   $('deleteConfirmYes').addEventListener('click', executeDelete);
   $('deleteConfirmCancel').addEventListener('click', hideDeleteConfirm);
+
+  // Deploy banner
+  $('deployBannerClose').addEventListener('click', hideDeployBanner);
+  $('deployBannerCancel').addEventListener('click', hideDeployBanner);
+  $('deployBannerSubmit').addEventListener('click', handleDeploySubmit);
+  $('deployHookInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleDeploySubmit(); });
 
   // Recent + draft
   $('recentClearBtn').addEventListener('click', clearRecent);

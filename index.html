@@ -1828,6 +1828,11 @@ function clearContent(idx) {
 }
 
 async function pasteContent(idx) {
+  const existing = files[idx] && files[idx].content || '';
+  if (existing.length > 0) {
+    showStatus('warn', 'المربع فيه محتوى. اضغط "مسح" أولاً ثم "لصق".');
+    return;
+  }
   try {
     const text = await navigator.clipboard.readText();
     if (!text) {
